@@ -2,7 +2,6 @@
 //!
 //! Provides modular detection capabilities for PII, secrets, and injections.
 
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 

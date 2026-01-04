@@ -2,11 +2,10 @@
 
 use serde_json::{json, Value};
 use std::collections::HashMap;
-use std::sync::Arc;
 
-use crate::pipeline::{ScreeningConfig, ScreeningDirection, ScreeningPipeline, Verdict};
+use crate::pipeline::{ScreeningConfig, ScreeningDirection, ScreeningPipeline};
 use crate::protocol::{CallToolResult, InputSchema, PropertySchema, Tool};
-use crate::screeners::{BidirectionalScreener, InputScreener, OutputScreener, ScreeningPolicy};
+use crate::screeners::{InputScreener, OutputScreener, ScreeningPolicy};
 
 /// Tool registry for security screening
 pub struct ToolRegistry {

@@ -3,7 +3,6 @@
 //! Provides InputScreener and OutputScreener for convenient security screening.
 
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 
 use crate::error::{SecurityError, SecurityResult};
 use crate::pipeline::{ScreeningConfig, ScreeningDirection, ScreeningPipeline, ScreeningResult, Verdict};
