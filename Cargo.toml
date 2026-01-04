@@ -1,0 +1,64 @@
+[package]
+name = "embeddenator-security-mcp"
+version = "0.1.0-alpha.1"
+edition = "2021"
+authors = ["Tyler Zervas <tzervas>"]
+license = "MIT"
+description = "MCP server for security screening - PII detection, secrets scanning, and injection prevention"
+repository = "https://github.com/tzervas/embeddenator-security-mcp"
+keywords = ["mcp", "security", "pii", "secrets", "injection"]
+categories = ["development-tools", "security"]
+
+[dependencies]
+# MCP and async runtime
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP/WebSocket for MCP
+axum = { version = "0.7", features = ["ws"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Pattern matching and regex
+regex = "1.10"
+lazy_static = "1.4"
+aho-corasick = "1.1"
+
+# Entropy detection for secrets
+base64 = "0.22"
+
+# Hashing for content signatures
+sha2 = "0.10"
+blake3 = "1.5"
+
+# UUID
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+# Time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Logging and tracing
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# CPU optimization for batch scanning
+rayon = "1.10"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Random for request IDs
+rand = "0.8"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3.0"
