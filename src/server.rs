@@ -1,12 +1,12 @@
 //! MCP server implementation for security screening
 
+use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::{
     extract::{Json, State},
     response::IntoResponse,
     routing::{get, post},
     Router,
 };
-use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use serde_json::json;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -14,9 +14,7 @@ use tokio::sync::RwLock;
 use crate::audit::AuditLogger;
 use crate::error::SecurityResult;
 use crate::pipeline::ScreeningConfig;
-use crate::protocol::{
-    CallToolRequest, JsonRpcError, JsonRpcRequest, JsonRpcResponse, RequestId,
-};
+use crate::protocol::{CallToolRequest, JsonRpcError, JsonRpcRequest, JsonRpcResponse, RequestId};
 use crate::screeners::ScreeningPolicy;
 use crate::subprocess::WebpuppetSubprocess;
 use crate::tools::ToolRegistry;
@@ -73,11 +71,22 @@ impl ServerState {
     pub async fn ensure_webpuppet_running(&self) -> SecurityResult<()> {
         let mut webpuppet = self.webpuppet.write().await;
         if webpuppet.is_none() || !webpuppet.as_mut().unwrap().is_alive().await {
-            let args: Vec<&str> = self.config.webpuppet_args.iter().map(|s| s.as_str()).collect();
-            *webpuppet = Some(WebpuppetSubprocess::spawn(
-                &self.config.webpuppet_path,
-                &args,
-            ).await.map_err(|e| crate::error::SecurityError::Internal(format!("Failed to spawn webpuppet: {}", e)))?);
+            let args: Vec<&str> = self
+                .config
+                .webpuppet_args
+                .iter()
+                .map(|s| s.as_str())
+                .collect();
+            *webpuppet = Some(
+                WebpuppetSubprocess::spawn(&self.config.webpuppet_path, &args)
+                    .await
+                    .map_err(|e| {
+                        crate::error::SecurityError::Internal(format!(
+                            "Failed to spawn webpuppet: {}",
+                            e
+                        ))
+                    })?,
+            );
         }
         Ok(())
     }
@@ -167,7 +176,13 @@ async fn handle_websocket_connection(mut socket: WebSocket, state: Arc<ServerSta
             Ok(Message::Text(text)) => {
                 if let Ok(request) = serde_json::from_str::<JsonRpcRequest>(&text) {
                     let response = process_request_ws(&state, request).await;
-                    if socket.send(Message::Text(serde_json::to_string(&response).unwrap().into())).await.is_err() {
+                    if socket
+                        .send(Message::Text(
+                            serde_json::to_string(&response).unwrap().into(),
+                        ))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
@@ -185,10 +200,15 @@ async fn process_request_ws(state: &ServerState, request: JsonRpcRequest) -> Jso
         "tools/call" => {
             // Screen the tool call arguments as input
             if let Some(params) = &request.params {
-                if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone()) {
-                    let args_str = serde_json::to_string(&call_request.arguments).unwrap_or_default();
+                if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone())
+                {
+                    let args_str =
+                        serde_json::to_string(&call_request.arguments).unwrap_or_default();
                     if let Err(_) = state.tools.screen_input_sync(&args_str) {
-                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_params("Security policy violation"));
+                        return JsonRpcResponse::error(
+                            request.id,
+                            JsonRpcError::invalid_params("Security policy violation"),
+                        );
                     }
                 }
             }
@@ -200,7 +220,9 @@ async fn process_request_ws(state: &ServerState, request: JsonRpcRequest) -> Jso
     state.ensure_webpuppet_running().await.unwrap();
     let mut webpuppet = state.webpuppet.write().await;
     if let Some(ref mut wp) = *webpuppet {
-        wp.send_request(&serde_json::to_value(&request).unwrap()).await.unwrap();
+        wp.send_request(&serde_json::to_value(&request).unwrap())
+            .await
+            .unwrap();
         if let Some(response_str) = wp.receive_response().await {
             if let Ok(response) = serde_json::from_str(&response_str) {
                 return response;
@@ -208,7 +230,10 @@ async fn process_request_ws(state: &ServerState, request: JsonRpcRequest) -> Jso
         }
     }
 
-    JsonRpcResponse::error(request.id, JsonRpcError::internal_error("Webpuppet communication failed"))
+    JsonRpcResponse::error(
+        request.id,
+        JsonRpcError::internal_error("Webpuppet communication failed"),
+    )
 }
 
 /// Process MCP request
@@ -218,10 +243,15 @@ async fn process_request(state: &ServerState, request: JsonRpcRequest) -> JsonRp
         "tools/call" => {
             // Screen the tool call arguments as input
             if let Some(params) = &request.params {
-                if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone()) {
-                    let args_str = serde_json::to_string(&call_request.arguments).unwrap_or_default();
+                if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone())
+                {
+                    let args_str =
+                        serde_json::to_string(&call_request.arguments).unwrap_or_default();
                     if let Err(_) = state.tools.screen_input_sync(&args_str) {
-                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_params("Security policy violation"));
+                        return JsonRpcResponse::error(
+                            request.id,
+                            JsonRpcError::invalid_params("Security policy violation"),
+                        );
                     }
                 }
             }
@@ -233,7 +263,9 @@ async fn process_request(state: &ServerState, request: JsonRpcRequest) -> JsonRp
     state.ensure_webpuppet_running().await.unwrap();
     let mut webpuppet = state.webpuppet.write().await;
     if let Some(ref mut wp) = *webpuppet {
-        wp.send_request(&serde_json::to_value(&request).unwrap()).await.unwrap();
+        wp.send_request(&serde_json::to_value(&request).unwrap())
+            .await
+            .unwrap();
         if let Some(response_str) = wp.receive_response().await {
             if let Ok(response) = serde_json::from_str(&response_str) {
                 return response;
@@ -241,7 +273,10 @@ async fn process_request(state: &ServerState, request: JsonRpcRequest) -> JsonRp
         }
     }
 
-    JsonRpcResponse::error(request.id, JsonRpcError::internal_error("Webpuppet communication failed"))
+    JsonRpcResponse::error(
+        request.id,
+        JsonRpcError::internal_error("Webpuppet communication failed"),
+    )
 }
 
 /// Stdio transport for MCP

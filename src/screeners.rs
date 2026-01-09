@@ -5,7 +5,9 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::{SecurityError, SecurityResult};
-use crate::pipeline::{ScreeningConfig, ScreeningDirection, ScreeningPipeline, ScreeningResult, Verdict};
+use crate::pipeline::{
+    ScreeningConfig, ScreeningDirection, ScreeningPipeline, ScreeningResult, Verdict,
+};
 
 /// Security policy configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -90,12 +92,12 @@ impl InputScreener {
         let result = self.pipeline.screen(content, ScreeningDirection::Input)?;
 
         match result.verdict {
-            Verdict::Blocked => {
-                Err(SecurityError::InjectionDetected(self.policy.blocked_message.clone()))
-            }
-            Verdict::Warning if !self.policy.allow_warnings => {
-                Err(SecurityError::Blocked("Content flagged with warnings".to_string()))
-            }
+            Verdict::Blocked => Err(SecurityError::InjectionDetected(
+                self.policy.blocked_message.clone(),
+            )),
+            Verdict::Warning if !self.policy.allow_warnings => Err(SecurityError::Blocked(
+                "Content flagged with warnings".to_string(),
+            )),
             _ => Ok(ScreenedContent {
                 original: content.to_string(),
                 processed: content.to_string(),
@@ -150,12 +152,13 @@ impl OutputScreener {
         let result = self.pipeline.screen(content, ScreeningDirection::Output)?;
 
         match result.verdict {
-            Verdict::Blocked => {
-                Err(SecurityError::Blocked(self.policy.blocked_message.clone()))
-            }
+            Verdict::Blocked => Err(SecurityError::Blocked(self.policy.blocked_message.clone())),
             Verdict::Redact => {
                 if self.policy.allow_redacted {
-                    let processed = result.redacted_content.clone().unwrap_or_else(|| content.to_string());
+                    let processed = result
+                        .redacted_content
+                        .clone()
+                        .unwrap_or_else(|| content.to_string());
                     Ok(ScreenedContent {
                         original: content.to_string(),
                         processed,
@@ -163,12 +166,14 @@ impl OutputScreener {
                         result,
                     })
                 } else {
-                    Err(SecurityError::PiiDetected("Content requires redaction but redaction is disabled".to_string()))
+                    Err(SecurityError::PiiDetected(
+                        "Content requires redaction but redaction is disabled".to_string(),
+                    ))
                 }
             }
-            Verdict::Warning if !self.policy.allow_warnings => {
-                Err(SecurityError::Blocked("Content flagged with warnings".to_string()))
-            }
+            Verdict::Warning if !self.policy.allow_warnings => Err(SecurityError::Blocked(
+                "Content flagged with warnings".to_string(),
+            )),
             _ => Ok(ScreenedContent {
                 original: content.to_string(),
                 processed: content.to_string(),
@@ -186,7 +191,9 @@ impl OutputScreener {
 
     /// Quick check if content is safe for output
     pub fn is_safe(&self, content: &str) -> bool {
-        self.screen(content).map(|r| !r.was_modified).unwrap_or(false)
+        self.screen(content)
+            .map(|r| !r.was_modified)
+            .unwrap_or(false)
     }
 
     /// Get the policy
@@ -281,10 +288,10 @@ mod tests {
     #[test]
     fn test_bidirectional() {
         let screener = BidirectionalScreener::new();
-        
+
         // Safe input
         assert!(screener.screen_input("normal query").is_ok());
-        
+
         // Safe output
         assert!(screener.screen_output("normal response").is_ok());
     }

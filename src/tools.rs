@@ -46,7 +46,10 @@ impl ToolRegistry {
     }
 
     /// Screen input content (sync)
-    pub fn screen_input_sync(&self, content: &str) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
+    pub fn screen_input_sync(
+        &self,
+        content: &str,
+    ) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
         self.input_screener.screen(content)
     }
 

@@ -239,7 +239,9 @@ impl CallToolResult {
 
     pub fn error(message: impl Into<String>) -> Self {
         Self {
-            content: vec![Content::Text { text: message.into() }],
+            content: vec![Content::Text {
+                text: message.into(),
+            }],
             is_error: true,
         }
     }

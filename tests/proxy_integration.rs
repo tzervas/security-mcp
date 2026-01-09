@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
     use super::*;
-    use embeddenator_security_mcp::server::{SecurityServer, ServerConfig};
     use embeddenator_security_mcp::pipeline::ScreeningConfig;
     use embeddenator_security_mcp::screeners::ScreeningPolicy;
+    use embeddenator_security_mcp::server::{SecurityServer, ServerConfig};
 
     #[tokio::test]
     async fn test_proxy_request_flow() {

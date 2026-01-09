@@ -40,9 +40,10 @@ impl AuditLogger {
 pub async fn handle_sse(
     State(state): State<Arc<super::server::ServerState>>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let stream = state.audit.subscribe().map(|event| {
-        Ok(Event::default().data(serde_json::to_string(&event.unwrap()).unwrap()))
-    });
+    let stream = state
+        .audit
+        .subscribe()
+        .map(|event| Ok(Event::default().data(serde_json::to_string(&event.unwrap()).unwrap())));
 
     Sse::new(stream).keep_alive(
         axum::response::sse::KeepAlive::new()

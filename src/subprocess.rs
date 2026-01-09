@@ -1,8 +1,8 @@
+use serde_json::Value;
+use std::process::Stdio;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, Command};
 use tokio::sync::mpsc::{self, Receiver, Sender};
-use serde_json::Value;
-use std::process::Stdio;
 
 pub struct WebpuppetSubprocess {
     child: Child,
