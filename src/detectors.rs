@@ -160,8 +160,8 @@ impl Default for PiiDetector {
 }
 
 impl PiiDetector {
-    /// Create a new PII detector
-    pub fn new() -> Self {
+    /// Create a new PII detector with advanced detection enabled
+    pub fn with_advanced_detection() -> Self {
         Self::default()
     }
 
@@ -174,7 +174,7 @@ impl PiiDetector {
 
     /// Advanced detection with context analysis
     pub fn detect_advanced(&self, content: &str) -> DetectorResult {
-        let mut result = self.detect(content);
+        let mut result = DetectorResult::empty();
 
         // Enhanced email detection with context
         let email_regex = regex::Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap();
@@ -240,7 +240,34 @@ impl Detector for PiiDetector {
     }
 
     fn detect(&self, content: &str) -> DetectorResult {
-        self.detect_advanced(content)
+        let mut result = DetectorResult::empty();
+
+        for (pii_type, pattern) in PiiPatterns::all() {
+            if !self.enabled_types.contains(pii_type) {
+                continue;
+            }
+
+            for mat in pattern.find_iter(content) {
+                let severity = Self::severity_for_type(pii_type);
+                let action = match severity {
+                    Severity::Critical | Severity::High => SuggestedAction::Redact,
+                    _ => SuggestedAction::Review,
+                };
+
+                result.add_finding(Finding {
+                    finding_type: format!("pii.{}", pii_type),
+                    severity,
+                    description: format!("Potential {} detected", pii_type.replace('_', " ")),
+                    matched: Self::redact_match(mat.as_str(), pii_type),
+                    start: mat.start(),
+                    end: mat.end(),
+                    confidence: 0.85,
+                    action,
+                });
+            }
+        }
+
+        result
     }
 }
 
@@ -306,22 +333,7 @@ impl SecretDetector {
         }).sum()
     }
 
-    /// Calculate Shannon entropy
-    fn entropy(s: &str) -> f64 {
-        let mut freq = [0u32; 256];
-        for b in s.bytes() {
-            freq[b as usize] += 1;
-        }
 
-        let len = s.len() as f64;
-        freq.iter()
-            .filter(|&&c| c > 0)
-            .map(|&c| {
-                let p = c as f64 / len;
-                -p * p.log2()
-            })
-            .sum()
-    }
 
     fn severity_for_type(secret_type: &str) -> Severity {
         match secret_type {
@@ -455,7 +467,7 @@ mod tests {
 
     #[test]
     fn test_pii_detector() {
-        let detector = PiiDetector::new();
+        let detector = PiiDetector::with_advanced_detection();
         let result = detector.detect("Contact me at user@example.com or 555-123-4567");
         
         assert!(!result.findings.is_empty());

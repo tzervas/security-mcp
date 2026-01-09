@@ -7,8 +7,7 @@ use axum::{
     Router,
 };
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
-use futures::SinkExt;
-use serde_json::{json, Value};
+use serde_json::json;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -16,8 +15,7 @@ use crate::audit::AuditLogger;
 use crate::error::SecurityResult;
 use crate::pipeline::ScreeningConfig;
 use crate::protocol::{
-    CallToolRequest, InitializeResult, JsonRpcError, JsonRpcRequest, JsonRpcResponse,
-    MCP_VERSION, RequestId, ServerCapabilities, ServerInfo, ToolsCapability,
+    CallToolRequest, JsonRpcError, JsonRpcRequest, JsonRpcResponse, RequestId,
 };
 use crate::screeners::ScreeningPolicy;
 use crate::subprocess::WebpuppetSubprocess;

@@ -119,7 +119,7 @@ impl ScreeningPipeline {
         let mut detectors: Vec<Arc<dyn Detector>> = Vec::new();
 
         if config.enable_pii {
-            detectors.push(Arc::new(PiiDetector::new()));
+            detectors.push(Arc::new(PiiDetector::with_advanced_detection()));
         }
         if config.enable_secrets {
             detectors.push(Arc::new(SecretDetector::new()));

@@ -143,9 +143,9 @@ lazy_static! {
         r"(?:\{\{.*\}\}|\{%.*%\}|\$\{.*\}|<%.*%>|#\{.*\})"
     ).unwrap();
     
-    /// Prompt injection patterns
+    /// Prompt injection patterns (enhanced based on webpuppet patterns)
     pub static ref PROMPT_INJECTION: Regex = Regex::new(
-        r"(?i)(?:ignore\s+(?:previous|above|all)\s+instructions?|disregard\s+(?:previous|above)|forget\s+(?:everything|previous)|new\s+instruction|system\s*:\s*you\s+are|act\s+as|pretend\s+you\s+are|jailbreak|DAN\s+mode)"
+        r"(?i)(?:ignore\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|prompts?|context|rules)|disregard\s+(all\s+)?(previous|prior|above|earlier)|forget\s+(all\s+)?(previous|prior|above|earlier)\s+(instructions?|context)|new\s+(system\s+)?instructions?:|you\s+are\s+now\s+(a|an|the)|act\s+as\s+(if\s+)?(a|an|the)|pretend\s+(to\s+be|you\s+are)\s+(a|an|the)|\[(system|assistant|user|human)\]|<<\s*sys(tem)?\s*>>|```\s*(system|prompt|instruction)|(end|close|exit|finish)\s*(of\s*)?(prompt|context|message|conversation)|(print|output|reveal|show|display|expose)\s+(the\s+)?(system\s+)?(prompt|instructions?|context|rules)|(do\s+anything\s+now|dan\s+mode|developer\s+mode|unlocked\s+mode|jailbreak|uncensored))"
     ).unwrap();
     
     /// Control characters
