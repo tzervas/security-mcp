@@ -45,6 +45,29 @@ impl ToolRegistry {
         ]
     }
 
+    /// Screen input content (sync)
+    pub fn screen_input_sync(&self, content: &str) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
+        self.input_screener.screen(content)
+    }
+
+    /// Screen input content
+    pub async fn screen_input(&self, args: HashMap<String, Value>) -> CallToolResult {
+        let content = match args.get("content") {
+            Some(Value::String(s)) => s,
+            _ => return CallToolResult::error("Missing or invalid 'content' parameter"),
+        };
+
+        match self.input_screener.screen(content) {
+            Ok(result) => CallToolResult::json(json!({
+                "original": result.original,
+                "processed": result.processed,
+                "was_modified": result.was_modified,
+                "result": result.result
+            })),
+            Err(e) => CallToolResult::error(format!("Screening failed: {}", e)),
+        }
+    }
+
     /// Execute a tool by name
     pub async fn execute(&self, name: &str, args: HashMap<String, Value>) -> CallToolResult {
         match name {
@@ -135,36 +158,6 @@ impl ToolRegistry {
     }
 
     // Tool implementations
-
-    async fn screen_input(&self, args: HashMap<String, Value>) -> CallToolResult {
-        let content = match args.get("content").and_then(|v| v.as_str()) {
-            Some(c) => c,
-            None => return CallToolResult::error("Missing required parameter: content"),
-        };
-
-        match self.input_screener.screen(content) {
-            Ok(result) => CallToolResult::json(json!({
-                "verdict": format!("{:?}", result.result.verdict),
-                "is_safe": result.result.is_allowed(),
-                "was_modified": result.was_modified,
-                "findings_count": result.result.findings.len(),
-                "findings": result.result.findings.iter().map(|f| json!({
-                    "type": f.finding_type,
-                    "severity": format!("{:?}", f.severity),
-                    "description": f.description,
-                    "confidence": f.confidence
-                })).collect::<Vec<_>>(),
-                "risk_score": result.result.risk_score,
-                "processing_time_ms": result.result.processing_time_ms
-            })),
-            Err(e) => CallToolResult::json(json!({
-                "verdict": "Blocked",
-                "is_safe": false,
-                "error": e.to_string(),
-                "blocked_reason": format!("{:?}", e)
-            })),
-        }
-    }
 
     async fn screen_output(&self, args: HashMap<String, Value>) -> CallToolResult {
         let content = match args.get("content").and_then(|v| v.as_str()) {

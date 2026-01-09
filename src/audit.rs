@@ -1,7 +1,9 @@
+use axum::extract::State;
 use axum::response::sse::{Event, Sse};
-use futures::stream::{self, Stream};
+use futures::stream::Stream;
 use serde::{Deserialize, Serialize};
 use std::convert::Infallible;
+use std::sync::Arc;
 use tokio::sync::broadcast;
 use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 
@@ -36,9 +38,9 @@ impl AuditLogger {
 }
 
 pub async fn handle_sse(
-    State(audit): State<Arc<AuditLogger>>,
+    State(state): State<Arc<super::server::ServerState>>,
 ) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let stream = audit.subscribe().map(|event| {
+    let stream = state.audit.subscribe().map(|event| {
         Ok(Event::default().data(serde_json::to_string(&event.unwrap()).unwrap()))
     });
 

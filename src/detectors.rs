@@ -220,7 +220,7 @@ impl PiiDetector {
     fn redact_match(s: &str, pii_type: &str) -> String {
         match pii_type {
             "email" => {
-                if let Some(at_pos) = s.find('@') {
+                if let Some(_at_pos) = s.find('@') {
                     format!("{}***@***", &s[..1.min(s.len())])
                 } else {
                     "[EMAIL]".to_string()

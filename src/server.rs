@@ -7,7 +7,7 @@ use axum::{
     Router,
 };
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
-use futures::{SinkExt, StreamExt};
+use futures::SinkExt;
 use serde_json::{json, Value};
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -55,11 +55,10 @@ impl Default for ServerConfig {
 pub struct ServerState {
     tools: Arc<ToolRegistry>,
     webpuppet: Arc<RwLock<Option<WebpuppetSubprocess>>>,
-    audit: Arc<AuditLogger>,
+    pub audit: Arc<AuditLogger>,
     config: ServerConfig,
 }
 
-impl ServerState {
 impl ServerState {
     pub fn new(config: &ServerConfig) -> Self {
         Self {
@@ -170,7 +169,7 @@ async fn handle_websocket_connection(mut socket: WebSocket, state: Arc<ServerSta
             Ok(Message::Text(text)) => {
                 if let Ok(request) = serde_json::from_str::<JsonRpcRequest>(&text) {
                     let response = process_request_ws(&state, request).await;
-                    if socket.send(Message::Text(serde_json::to_string(&response).unwrap())).await.is_err() {
+                    if socket.send(Message::Text(serde_json::to_string(&response).unwrap().into())).await.is_err() {
                         break;
                     }
                 }
@@ -186,12 +185,12 @@ async fn process_request_ws(state: &ServerState, request: JsonRpcRequest) -> Jso
     // Apply security screening first
     match request.method.as_str() {
         "tools/call" => {
-            // Screen the tool call
+            // Screen the tool call arguments as input
             if let Some(params) = &request.params {
                 if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone()) {
-                    let screening_result = state.tools.screen_tool_call(&call_request).await;
-                    if !screening_result.allowed {
-                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_request("Security policy violation"));
+                    let args_str = serde_json::to_string(&call_request.arguments).unwrap_or_default();
+                    if let Err(_) = state.tools.screen_input_sync(&args_str) {
+                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_params("Security policy violation"));
                     }
                 }
             }
@@ -219,12 +218,12 @@ async fn process_request(state: &ServerState, request: JsonRpcRequest) -> JsonRp
     // Apply security screening first
     match request.method.as_str() {
         "tools/call" => {
-            // Screen the tool call
+            // Screen the tool call arguments as input
             if let Some(params) = &request.params {
                 if let Ok(call_request) = serde_json::from_value::<CallToolRequest>(params.clone()) {
-                    let screening_result = state.tools.screen_tool_call(&call_request).await;
-                    if !screening_result.allowed {
-                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_request("Security policy violation"));
+                    let args_str = serde_json::to_string(&call_request.arguments).unwrap_or_default();
+                    if let Err(_) = state.tools.screen_input_sync(&args_str) {
+                        return JsonRpcResponse::error(request.id, JsonRpcError::invalid_params("Security policy violation"));
                     }
                 }
             }
@@ -245,60 +244,6 @@ async fn process_request(state: &ServerState, request: JsonRpcRequest) -> JsonRp
     }
 
     JsonRpcResponse::error(request.id, JsonRpcError::internal_error("Webpuppet communication failed"))
-}
-
-fn handle_initialize(id: RequestId) -> JsonRpcResponse {
-    let result = InitializeResult {
-        protocol_version: MCP_VERSION.to_string(),
-        capabilities: ServerCapabilities {
-            tools: Some(ToolsCapability { list_changed: true }),
-        },
-        server_info: ServerInfo {
-            name: "embeddenator-security-mcp".to_string(),
-            version: env!("CARGO_PKG_VERSION").to_string(),
-        },
-    };
-    JsonRpcResponse::success(id, serde_json::to_value(result).unwrap())
-}
-
-fn handle_initialized(id: RequestId) -> JsonRpcResponse {
-    JsonRpcResponse::success(id, json!({}))
-}
-
-fn handle_list_tools(id: RequestId, state: &ServerState) -> JsonRpcResponse {
-    let tools = state.tools.list_tools();
-    JsonRpcResponse::success(id, json!({ "tools": tools }))
-}
-
-async fn handle_call_tool(
-    id: RequestId,
-    state: &ServerState,
-    params: Option<Value>,
-) -> JsonRpcResponse {
-    let params = match params {
-        Some(p) => p,
-        None => return JsonRpcResponse::error(id, JsonRpcError::invalid_params("Missing params")),
-    };
-
-    let call_request: CallToolRequest = match serde_json::from_value(params) {
-        Ok(r) => r,
-        Err(e) => {
-            return JsonRpcResponse::error(
-                id,
-                JsonRpcError::invalid_params(format!("Invalid params: {}", e)),
-            )
-        }
-    };
-
-    let result = state
-        .tools
-        .execute(&call_request.name, call_request.arguments)
-        .await;
-    JsonRpcResponse::success(id, serde_json::to_value(result).unwrap())
-}
-
-fn handle_ping(id: RequestId) -> JsonRpcResponse {
-    JsonRpcResponse::success(id, json!({}))
 }
 
 /// Stdio transport for MCP
