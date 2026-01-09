@@ -172,6 +172,41 @@ impl PiiDetector {
         }
     }
 
+    /// Advanced detection with context analysis
+    pub fn detect_advanced(&self, content: &str) -> DetectorResult {
+        let mut result = self.detect(content);
+
+        // Enhanced email detection with context
+        let email_regex = regex::Regex::new(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b").unwrap();
+        for mat in email_regex.find_iter(content) {
+            // Check context for false positives
+            let start = mat.start().saturating_sub(50);
+            let end = (mat.end() + 50).min(content.len());
+            let context = &content[start..end];
+
+            if !self.is_likely_false_positive(context) {
+                result.add_finding(Finding {
+                    finding_type: "pii.email".to_string(),
+                    severity: Severity::High,
+                    description: "Email address detected".to_string(),
+                    matched: Self::redact_match(mat.as_str(), "email"),
+                    start: mat.start(),
+                    end: mat.end(),
+                    confidence: 0.9,
+                    action: SuggestedAction::Redact,
+                });
+            }
+        }
+
+        // Add similar enhancements for phone numbers, SSNs, etc.
+        result
+    }
+
+    fn is_likely_false_positive(&self, context: &str) -> bool {
+        // Check for common false positives like documentation examples
+        context.contains("example.com") || context.contains("test@") || context.contains("user@domain")
+    }
+
     fn severity_for_type(pii_type: &str) -> Severity {
         match pii_type {
             "ssn" | "credit_card" => Severity::Critical,
@@ -205,34 +240,7 @@ impl Detector for PiiDetector {
     }
 
     fn detect(&self, content: &str) -> DetectorResult {
-        let mut result = DetectorResult::empty();
-
-        for (pii_type, pattern) in PiiPatterns::all() {
-            if !self.enabled_types.contains(pii_type) {
-                continue;
-            }
-
-            for mat in pattern.find_iter(content) {
-                let severity = Self::severity_for_type(pii_type);
-                let action = match severity {
-                    Severity::Critical | Severity::High => SuggestedAction::Redact,
-                    _ => SuggestedAction::Review,
-                };
-
-                result.add_finding(Finding {
-                    finding_type: format!("pii.{}", pii_type),
-                    severity,
-                    description: format!("Potential {} detected", pii_type.replace('_', " ")),
-                    matched: Self::redact_match(mat.as_str(), pii_type),
-                    start: mat.start(),
-                    end: mat.end(),
-                    confidence: 0.85,
-                    action,
-                });
-            }
-        }
-
-        result
+        self.detect_advanced(content)
     }
 }
 
@@ -258,6 +266,44 @@ impl SecretDetector {
     /// Create a new secret detector
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Entropy-based detection for potential secrets
+    pub fn detect_entropy_based(&self, content: &str) -> DetectorResult {
+        let mut result = DetectorResult::empty();
+
+        // Split content into potential tokens
+        for line in content.lines() {
+            for word in line.split_whitespace() {
+                if word.len() > 20 && self.calculate_entropy(word) > self.entropy_threshold {
+                    result.add_finding(Finding {
+                        finding_type: "secret.high_entropy".to_string(),
+                        severity: Severity::High,
+                        description: "High-entropy string detected (potential secret)".to_string(),
+                        matched: format!("{}...", &word[..8.min(word.len())]),
+                        start: line.find(word).unwrap_or(0),
+                        end: line.find(word).unwrap_or(0) + word.len(),
+                        confidence: 0.8,
+                        action: SuggestedAction::Block,
+                    });
+                }
+            }
+        }
+
+        result
+    }
+
+    fn calculate_entropy(&self, s: &str) -> f64 {
+        use std::collections::HashMap;
+        let mut freq = HashMap::new();
+        for c in s.chars() {
+            *freq.entry(c).or_insert(0) += 1;
+        }
+        let len = s.len() as f64;
+        freq.values().map(|&count| {
+            let p = count as f64 / len;
+            -p * p.log2()
+        }).sum()
     }
 
     /// Calculate Shannon entropy
@@ -317,28 +363,8 @@ impl Detector for SecretDetector {
             }
         }
 
-        // High entropy string detection (potential secrets)
-        for (i, word) in content.split_whitespace().enumerate() {
-            if word.len() >= 20 && Self::entropy(word) > self.entropy_threshold {
-                // Skip if already matched by a pattern
-                let already_matched = result.findings.iter().any(|f| {
-                    f.start <= i && f.end >= i
-                });
-
-                if !already_matched {
-                    result.add_finding(Finding {
-                        finding_type: "secret.high_entropy".to_string(),
-                        severity: Severity::Medium,
-                        description: "High entropy string detected (potential secret)".to_string(),
-                        matched: format!("{}...", &word[..8.min(word.len())]),
-                        start: 0,
-                        end: word.len(),
-                        confidence: 0.6,
-                        action: SuggestedAction::Review,
-                    });
-                }
-            }
-        }
+        // Merge entropy-based detection
+        result.merge(self.detect_entropy_based(content));
 
         result
     }

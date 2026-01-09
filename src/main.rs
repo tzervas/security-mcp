@@ -45,6 +45,22 @@ struct Args {
     #[arg(long, default_value = "3001")]
     port: u16,
 
+    /// Path to webpuppet-rs-mcp binary
+    #[arg(long, default_value = "webpuppet-rs-mcp")]
+    webpuppet_path: String,
+
+    /// Arguments to pass to webpuppet-rs-mcp
+    #[arg(long, num_args = 0.., default_values = &["--stdio"])]
+    webpuppet_args: Vec<String>,
+
+    /// Enable WebSocket transport
+    #[arg(long, default_value = "true")]
+    websocket: bool,
+
+    /// Enable SSE audit logging
+    #[arg(long, default_value = "true")]
+    sse: bool,
+
     /// Enable PII detection
     #[arg(long, default_value = "true")]
     pii: bool,
@@ -104,6 +120,10 @@ async fn main() -> anyhow::Result<()> {
         port: args.port,
         screening: screening_config,
         policy,
+        webpuppet_path: args.webpuppet_path,
+        webpuppet_args: args.webpuppet_args,
+        enable_websocket: args.websocket,
+        enable_sse: args.sse,
     };
 
     if args.stdio {
