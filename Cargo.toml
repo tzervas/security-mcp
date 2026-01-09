@@ -21,7 +21,7 @@ serde_json = "1.0"
 
 # HTTP/WebSocket for MCP
 axum = { version = "0.8", features = ["ws"] }
-tower = "0.4"
+tower = "0.5"
 tower-http = { version = "0.5", features = ["cors", "trace"] }
 
 # Pattern matching and regex
