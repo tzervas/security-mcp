@@ -8,24 +8,21 @@ use std::collections::HashSet;
 use crate::patterns::{InjectionPatterns, PiiPatterns, SecretPatterns};
 
 /// Severity level of a finding
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
+)]
 pub enum Severity {
     /// Informational - may warrant attention
     Info,
     /// Low severity - minor concern
     Low,
     /// Medium severity - should be addressed
+    #[default]
     Medium,
     /// High severity - significant risk
     High,
     /// Critical severity - immediate action required
     Critical,
-}
-
-impl Default for Severity {
-    fn default() -> Self {
-        Self::Medium
-    }
 }
 
 /// A security finding
@@ -50,7 +47,7 @@ pub struct Finding {
 }
 
 /// Suggested action for a finding
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum SuggestedAction {
     /// Allow - finding is informational
     Allow,
@@ -59,13 +56,8 @@ pub enum SuggestedAction {
     /// Block - prevent the content from proceeding
     Block,
     /// Review - flag for human review
+    #[default]
     Review,
-}
-
-impl Default for SuggestedAction {
-    fn default() -> Self {
-        Self::Review
-    }
 }
 
 /// Result from a detector
@@ -189,7 +181,7 @@ impl PiiDetector {
     fn redact_match(s: &str, pii_type: &str) -> String {
         match pii_type {
             "email" => {
-                if let Some(at_pos) = s.find('@') {
+                if s.find('@').is_some() {
                     format!("{}***@***", &s[..1.min(s.len())])
                 } else {
                     "[EMAIL]".to_string()

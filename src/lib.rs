@@ -1,4 +1,4 @@
-//! embeddenator-security-mcp
+//! security-mcp
 //!
 //! MCP server for security screening of inputs and outputs.
 //!

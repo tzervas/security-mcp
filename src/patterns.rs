@@ -145,7 +145,7 @@ lazy_static! {
 
     /// Prompt injection patterns
     pub static ref PROMPT_INJECTION: Regex = Regex::new(
-        r"(?i)(?:ignore\s+(?:previous|above|all)\s+instructions?|disregard\s+(?:previous|above)|forget\s+(?:everything|previous)|new\s+instruction|system\s*:\s*you\s+are|act\s+as|pretend\s+you\s+are|jailbreak|DAN\s+mode)"
+        r"(?i)(?:ignore\s+(?:previous|above|all)\s+instructions?|disregard\s+(?:previous|above|all)|forget\s+(?:everything|previous|all)|new\s+instruction|system\s*:\s*you\s+are|act\s+as|pretend\s+you\s+are|jailbreak|DAN\s+mode)"
     ).unwrap();
 
     /// Control characters

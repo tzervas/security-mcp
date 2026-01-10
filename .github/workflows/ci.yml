@@ -30,7 +30,7 @@ jobs:
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
         with:
-          key: embeddenator-security-mcp
+          key: security-mcp
       
       - name: Check formatting
         run: cargo fmt --check

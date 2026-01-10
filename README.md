@@ -1,4 +1,4 @@
-# embeddenator-security-mcp
+# security-mcp
 
 MCP server for security screening: prompt-injection defense, PII detection, and secrets scanning.
 
@@ -24,7 +24,7 @@ Alpha / under active development. Rules and thresholds will evolve.
 ## Running
 
 ```bash
-cargo run -p embeddenator-security-mcp -- --help
+cargo run -p security-mcp -- --help
 ```
 
 ## License

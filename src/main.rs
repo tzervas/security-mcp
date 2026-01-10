@@ -1,4 +1,4 @@
-//! embeddenator-security-mcp
+//! security-mcp
 //!
 //! MCP server for security screening of inputs and outputs.
 //!
@@ -10,17 +10,17 @@
 //!
 //! Run as HTTP server:
 //! ```bash
-//! embeddenator-security-mcp --host 127.0.0.1 --port 3001
+//! security-mcp --host 127.0.0.1 --port 3001
 //! ```
 //!
 //! Run as stdio transport:
 //! ```bash
-//! embeddenator-security-mcp --stdio
+//! security-mcp --stdio
 //! ```
 
 use clap::Parser;
 
-use embeddenator_security_mcp::{
+use security_mcp::{
     pipeline::ScreeningConfig,
     screeners::ScreeningPolicy,
     server::{SecurityServer, ServerConfig, StdioTransport},
@@ -29,7 +29,7 @@ use embeddenator_security_mcp::{
 
 /// Security Screening MCP Server
 #[derive(Parser, Debug)]
-#[command(name = "embeddenator-security-mcp")]
+#[command(name = "security-mcp")]
 #[command(about = "Security screening MCP server for PII, secrets, and injection detection")]
 #[command(version)]
 struct Args {

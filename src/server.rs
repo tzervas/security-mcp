@@ -107,7 +107,7 @@ impl SecurityServer {
 async fn health() -> impl IntoResponse {
     Json(json!({
         "status": "ok",
-        "server": "embeddenator-security-mcp",
+        "server": "security-mcp",
         "version": env!("CARGO_PKG_VERSION")
     }))
 }
@@ -140,7 +140,7 @@ fn handle_initialize(id: RequestId) -> JsonRpcResponse {
             tools: Some(ToolsCapability { list_changed: true }),
         },
         server_info: ServerInfo {
-            name: "embeddenator-security-mcp".to_string(),
+            name: "security-mcp".to_string(),
             version: env!("CARGO_PKG_VERSION").to_string(),
         },
     };
