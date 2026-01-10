@@ -1,10 +1,10 @@
 [package]
 name = "security-mcp"
-version = "0.1.0-alpha.2"
+version = "0.1.0-alpha"
 edition = "2021"
 authors = ["Tyler Zervas <tz-dev@vectorweight.com>"]
 license = "MIT"
-description = "MCP server for security screening - PII detection, secrets scanning, and injection prevention"
+description = "MCP (Model Context Protocol) server providing security screening, injection detection, and threat analysis"
 repository = "https://github.com/tzervas/security-mcp"
 keywords = ["mcp", "security", "pii", "secrets", "injection"]
 categories = ["development-tools", "security"]
