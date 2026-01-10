@@ -12,8 +12,8 @@ use std::sync::Arc;
 use crate::error::SecurityResult;
 use crate::pipeline::ScreeningConfig;
 use crate::protocol::{
-    CallToolRequest, InitializeResult, JsonRpcError, JsonRpcRequest, JsonRpcResponse,
-    MCP_VERSION, RequestId, ServerCapabilities, ServerInfo, ToolsCapability,
+    CallToolRequest, InitializeResult, JsonRpcError, JsonRpcRequest, JsonRpcResponse, RequestId,
+    ServerCapabilities, ServerInfo, ToolsCapability, MCP_VERSION,
 };
 use crate::screeners::ScreeningPolicy;
 use crate::tools::ToolRegistry;

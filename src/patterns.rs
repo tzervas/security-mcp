@@ -9,42 +9,42 @@ lazy_static! {
     // ==========================================================================
     // PII PATTERNS (Output Screening)
     // ==========================================================================
-    
+
     /// Email addresses
     pub static ref EMAIL: Regex = Regex::new(
         r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
     ).unwrap();
-    
+
     /// US Phone numbers (various formats)
     pub static ref PHONE_US: Regex = Regex::new(
         r"(?:\+?1[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?\d{3}[-.\s]?\d{4}"
     ).unwrap();
-    
+
     /// US Social Security Numbers
     pub static ref SSN: Regex = Regex::new(
         r"\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b"
     ).unwrap();
-    
+
     /// Credit card numbers (Visa, MC, Amex, Discover)
     pub static ref CREDIT_CARD: Regex = Regex::new(
         r"\b(?:4\d{3}|5[1-5]\d{2}|3[47]\d{2}|6(?:011|5\d{2}))[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b"
     ).unwrap();
-    
+
     /// IP addresses (IPv4)
     pub static ref IP_ADDRESS: Regex = Regex::new(
         r"\b(?:\d{1,3}\.){3}\d{1,3}\b"
     ).unwrap();
-    
+
     /// IPv6 addresses
     pub static ref IPV6_ADDRESS: Regex = Regex::new(
         r"(?i)\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b|(?:[0-9a-f]{1,4}:){1,7}:|(?:[0-9a-f]{1,4}:){1,6}:[0-9a-f]{1,4}"
     ).unwrap();
-    
+
     /// Physical addresses (US format)
     pub static ref STREET_ADDRESS: Regex = Regex::new(
         r"\b\d{1,5}\s+[\w\s]{1,50}(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|way|court|ct|circle|cir)\.?\b"
     ).unwrap();
-    
+
     /// Names (common patterns - limited accuracy)
     pub static ref PERSON_NAME: Regex = Regex::new(
         r"\b(?:Mr\.|Mrs\.|Ms\.|Dr\.)\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b"
@@ -53,52 +53,52 @@ lazy_static! {
     // ==========================================================================
     // SECRET PATTERNS (Output Screening)
     // ==========================================================================
-    
+
     /// AWS Access Key ID
     pub static ref AWS_ACCESS_KEY: Regex = Regex::new(
         r#"(?i)(?:aws|amazon)[_\-\s]?(?:access)[_\-\s]?(?:key)[_\-\s]?(?:id)?[=:\s]+['"]?([A-Z0-9]{20})['"]?"#
     ).unwrap();
-    
+
     /// AWS Secret Access Key
     pub static ref AWS_SECRET_KEY: Regex = Regex::new(
         r#"(?i)(?:aws|amazon)[_\-\s]?(?:secret)[_\-\s]?(?:access)?[_\-\s]?(?:key)?[=:\s]+['"]?([A-Za-z0-9/+=]{40})['"]?"#
     ).unwrap();
-    
+
     /// Generic API Key patterns
     pub static ref API_KEY: Regex = Regex::new(
         r#"(?i)(?:api[_\-\s]?key|apikey|api_secret|api_token)[=:\s]+['"]?([a-zA-Z0-9_\-]{20,})['"]?"#
     ).unwrap();
-    
+
     /// GitHub Token
     pub static ref GITHUB_TOKEN: Regex = Regex::new(
         r"(?:ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9_]{36,}"
     ).unwrap();
-    
+
     /// Generic Bearer Token
     pub static ref BEARER_TOKEN: Regex = Regex::new(
         r"(?i)bearer\s+[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-\.]+\.[a-zA-Z0-9_\-\.]+"
     ).unwrap();
-    
+
     /// Private Key headers
     pub static ref PRIVATE_KEY: Regex = Regex::new(
         r"-----BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY-----"
     ).unwrap();
-    
+
     /// Password in assignment
     pub static ref PASSWORD_ASSIGN: Regex = Regex::new(
         r#"(?i)(?:password|passwd|pwd|secret)[=:\s]+['"]?([^\s'"]{8,})['"]?"#
     ).unwrap();
-    
+
     /// Database connection strings
     pub static ref DB_CONNECTION: Regex = Regex::new(
         r"(?i)(?:mongodb|postgres|mysql|redis)://[^\s]+"
     ).unwrap();
-    
+
     /// Slack tokens
     pub static ref SLACK_TOKEN: Regex = Regex::new(
         r"xox[baprs]-[0-9a-zA-Z]{10,}"
     ).unwrap();
-    
+
     /// Generic high entropy strings (potential secrets)
     pub static ref HIGH_ENTROPY: Regex = Regex::new(
         r"[a-zA-Z0-9/+=_\-]{32,}"
@@ -107,47 +107,47 @@ lazy_static! {
     // ==========================================================================
     // INJECTION PATTERNS (Input Screening)
     // ==========================================================================
-    
+
     /// SQL Injection patterns
     pub static ref SQL_INJECTION: Regex = Regex::new(
         r#"(?i)(?:'\s*(?:or|and)\s+['\d]|union\s+(?:all\s+)?select|select\s+.*\s+from|insert\s+into|update\s+.*\s+set|delete\s+from|drop\s+(?:table|database)|;[\s\-]*(?:drop|delete|truncate|alter))"#
     ).unwrap();
-    
+
     /// Command injection patterns
     pub static ref CMD_INJECTION: Regex = Regex::new(
         r"(?:;\s*(?:ls|cat|rm|wget|curl|bash|sh|python|perl|nc|netcat)|`[^`]+`|\$\([^)]+\)|\|\s*(?:bash|sh|python))"
     ).unwrap();
-    
+
     /// Path traversal patterns
     pub static ref PATH_TRAVERSAL: Regex = Regex::new(
         r"(?:\.\.[\\/]|%2e%2e[\\/]|%252e%252e[\\/])"
     ).unwrap();
-    
+
     /// XSS patterns
     pub static ref XSS: Regex = Regex::new(
         r"(?i)(?:<script[^>]*>|javascript:|on(?:load|error|click|mouse|key|focus|blur|change|submit)\s*=|<iframe|<object|<embed)"
     ).unwrap();
-    
+
     /// LDAP injection
     pub static ref LDAP_INJECTION: Regex = Regex::new(
         r"[*)(|&!]"
     ).unwrap();
-    
+
     /// XML/XXE injection
     pub static ref XXE_INJECTION: Regex = Regex::new(
         r#"(?i)(?:<!DOCTYPE[^>]*\[|<!ENTITY|SYSTEM\s+['"](?:file|http|ftp)://)"#
     ).unwrap();
-    
+
     /// Template injection (SSTI)
     pub static ref TEMPLATE_INJECTION: Regex = Regex::new(
         r"(?:\{\{.*\}\}|\{%.*%\}|\$\{.*\}|<%.*%>|#\{.*\})"
     ).unwrap();
-    
+
     /// Prompt injection patterns
     pub static ref PROMPT_INJECTION: Regex = Regex::new(
         r"(?i)(?:ignore\s+(?:previous|above|all)\s+instructions?|disregard\s+(?:previous|above)|forget\s+(?:everything|previous)|new\s+instruction|system\s*:\s*you\s+are|act\s+as|pretend\s+you\s+are|jailbreak|DAN\s+mode)"
     ).unwrap();
-    
+
     /// Control characters
     pub static ref CONTROL_CHARS: Regex = Regex::new(
         r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]"
