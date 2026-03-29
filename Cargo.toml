@@ -33,7 +33,7 @@ aho-corasick = "^1.1"
 base64 = "^0.22"
 
 # Hashing for content signatures
-sha2 = "^0.10"
+sha2 = "^0.11"
 blake3 = "^1.5"
 
 # UUID
