@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `LICENSE` file (MIT, matching `Cargo.toml`'s declared license).
+- `tests/smoke.rs`: black-box integration smoke tests against the public API
+  (known secret is flagged, benign string is not, default config enables all
+  detectors).
+
+### Changed
+- README: clarified this is a content/text screener (regex + entropy
+  heuristics), explicitly **not** a repository/dependency/supply-chain
+  scanner, and not a substitute for `cargo audit`/`gitleaks`/`semgrep`/`trivy`.
+
 ## [0.1.0-alpha.2] - 2025-01-22
 
 ### Changed
