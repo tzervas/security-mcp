@@ -85,3 +85,8 @@ Add to your `claude_desktop_config.json`:
 ## License
 
 MIT
+
+## Status & roadmap
+
+- [Assessment & gaps](docs/ASSESSMENT.md)
+- [Product roadmap & API plans](docs/ROADMAP.md)
