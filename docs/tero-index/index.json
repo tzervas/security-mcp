@@ -1,0 +1,422 @@
+{
+  "generated": "Empirical/Declared — lite heading/line heuristic over markdown in security-mcp via tero-mcp/scripts/generate_lite_index.py; source files are ground truth. Generated 2026-07-09.",
+  "item_tag": "Empirical/Declared",
+  "siblings": [],
+  "items": [
+    {
+      "anchor": "contributing",
+      "family": "doc",
+      "kind": "section",
+      "title": "Contributing to This Project",
+      "file": "CONTRIBUTING.md",
+      "line": 1,
+      "tag": "Empirical/Declared",
+      "summary": "Thank you for your interest in contributing!"
+    },
+    {
+      "anchor": "contributing--development-setup",
+      "family": "doc",
+      "kind": "section",
+      "title": "Development Setup",
+      "file": "CONTRIBUTING.md",
+      "line": 5,
+      "tag": "Empirical/Declared",
+      "summary": "1. Clone the repository"
+    },
+    {
+      "anchor": "contributing--pull-request-process",
+      "family": "doc",
+      "kind": "section",
+      "title": "Pull Request Process",
+      "file": "CONTRIBUTING.md",
+      "line": 12,
+      "tag": "Empirical/Declared",
+      "summary": "1. Fork the repository"
+    },
+    {
+      "anchor": "contributing--code-style",
+      "family": "doc",
+      "kind": "section",
+      "title": "Code Style",
+      "file": "CONTRIBUTING.md",
+      "line": 20,
+      "tag": "Empirical/Declared",
+      "summary": "- Use cargo fmt for formatting"
+    },
+    {
+      "anchor": "contributing--license",
+      "family": "doc",
+      "kind": "section",
+      "title": "License",
+      "file": "CONTRIBUTING.md",
+      "line": 27,
+      "tag": "Empirical/Declared",
+      "summary": "By contributing, you agree that your contributions will be licensed under the MIT License."
+    },
+    {
+      "anchor": "readme",
+      "family": "doc",
+      "kind": "other",
+      "title": "security-mcp",
+      "file": "README.md",
+      "line": 1,
+      "tag": "Empirical/Declared",
+      "summary": "MCP server for security screening: prompt-injection defense, PII detection, and secrets scanning"
+    },
+    {
+      "anchor": "readme--what-this-is-not",
+      "family": "doc",
+      "kind": "section",
+      "title": "What This Is NOT",
+      "file": "README.md",
+      "line": 8,
+      "tag": "Empirical/Declared",
+      "summary": "This is a content/text screener, not a repository, dependency, or supply-chain scanner. It does"
+    },
+    {
+      "anchor": "readme--status",
+      "family": "doc",
+      "kind": "section",
+      "title": "Status",
+      "file": "README.md",
+      "line": 16,
+      "tag": "Empirical/Declared",
+      "summary": "Alpha / under active development. Rules and thresholds will evolve."
+    },
+    {
+      "anchor": "readme--what-it-does-today-code-backed",
+      "family": "doc",
+      "kind": "section",
+      "title": "What It Does Today (Code-Backed)",
+      "file": "README.md",
+      "line": 20,
+      "tag": "Empirical/Declared",
+      "summary": "- Runs an MCP-compatible JSON-RPC server over HTTP/WebSocket."
+    },
+    {
+      "anchor": "readme--what-it-does-not-do-yet",
+      "family": "doc",
+      "kind": "section",
+      "title": "What It Does Not Do Yet",
+      "file": "README.md",
+      "line": 31,
+      "tag": "Empirical/Declared",
+      "summary": "- Full DLP-grade PII detection (this is heuristic/pattern-based today)."
+    },
+    {
+      "anchor": "readme--running",
+      "family": "doc",
+      "kind": "section",
+      "title": "Running",
+      "file": "README.md",
+      "line": 40,
+      "tag": "Empirical/Declared",
+      "summary": "cargo run -p security-mcp -- --help"
+    },
+    {
+      "anchor": "readme--usage-with-vs-code-github-copilot",
+      "family": "doc",
+      "kind": "section",
+      "title": "Usage with VS Code / GitHub Copilot",
+      "file": "README.md",
+      "line": 46,
+      "tag": "Empirical/Declared",
+      "summary": "Install the binary:"
+    },
+    {
+      "anchor": "readme--usage-with-claude-desktop",
+      "family": "doc",
+      "kind": "section",
+      "title": "Usage with Claude Desktop",
+      "file": "README.md",
+      "line": 70,
+      "tag": "Empirical/Declared",
+      "summary": "Add to your claudedesktopconfig.json:"
+    },
+    {
+      "anchor": "readme--license",
+      "family": "doc",
+      "kind": "section",
+      "title": "License",
+      "file": "README.md",
+      "line": 85,
+      "tag": "Empirical/Declared",
+      "summary": "MIT"
+    },
+    {
+      "anchor": "readme--status-roadmap",
+      "family": "doc",
+      "kind": "section",
+      "title": "Status & roadmap",
+      "file": "README.md",
+      "line": 89,
+      "tag": "Empirical/Declared",
+      "summary": "- [Assessment & gaps](docs/ASSESSMENT.md)"
+    },
+    {
+      "anchor": "assessment",
+      "family": "doc",
+      "kind": "note",
+      "title": "security-mcp — Assessment & Gap Analysis",
+      "file": "docs/ASSESSMENT.md",
+      "line": 1,
+      "tag": "Empirical/Declared",
+      "summary": "Date: 2026-07-08"
+    },
+    {
+      "anchor": "assessment--1.-what-this-project-is-is-not",
+      "family": "doc",
+      "kind": "section",
+      "title": "1. What this project is / is not",
+      "file": "docs/ASSESSMENT.md",
+      "line": 10,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "assessment--2.-maturity",
+      "family": "doc",
+      "kind": "section",
+      "title": "2. Maturity",
+      "file": "docs/ASSESSMENT.md",
+      "line": 21,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "assessment--3.-in-flight-branches",
+      "family": "doc",
+      "kind": "section",
+      "title": "3. In-flight branches",
+      "file": "docs/ASSESSMENT.md",
+      "line": 34,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "assessment--4.-gaps-priority",
+      "family": "doc",
+      "kind": "section",
+      "title": "4. Gaps (priority)",
+      "file": "docs/ASSESSMENT.md",
+      "line": 44,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "assessment--5.-integration-fit",
+      "family": "doc",
+      "kind": "section",
+      "title": "5. Integration fit",
+      "file": "docs/ASSESSMENT.md",
+      "line": 58,
+      "tag": "Empirical/Declared",
+      "summary": "- Cabal: call as stdio MCP peer after tool allowlists exist; never sole gate."
+    },
+    {
+      "anchor": "roadmap",
+      "family": "doc",
+      "kind": "note",
+      "title": "security-mcp — Product Roadmap",
+      "file": "docs/ROADMAP.md",
+      "line": 1,
+      "tag": "Empirical/Declared",
+      "status": "Living (2026-07-08)",
+      "summary": "Status: Living (2026-07-08)"
+    },
+    {
+      "anchor": "roadmap--waves",
+      "family": "doc",
+      "kind": "section",
+      "title": "Waves",
+      "file": "docs/ROADMAP.md",
+      "line": 10,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "roadmap--wave-a-harden-what-exists",
+      "family": "doc",
+      "kind": "section",
+      "title": "Wave A — Harden what exists",
+      "file": "docs/ROADMAP.md",
+      "line": 12,
+      "tag": "Empirical/Declared",
+      "summary": "Triage origin/security-proxy-integration:"
+    },
+    {
+      "anchor": "roadmap--wave-b-proxy-wrap-path-from-paused-branch",
+      "family": "doc",
+      "kind": "section",
+      "title": "Wave B — Proxy / wrap path (from paused branch)",
+      "file": "docs/ROADMAP.md",
+      "line": 22,
+      "tag": "Empirical/Declared",
+      "summary": "Triage origin/security-proxy-integration:"
+    },
+    {
+      "anchor": "roadmap--wave-c-product-quality",
+      "family": "doc",
+      "kind": "section",
+      "title": "Wave C — Product quality",
+      "file": "docs/ROADMAP.md",
+      "line": 33,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "roadmap--api-plan",
+      "family": "doc",
+      "kind": "section",
+      "title": "API plan",
+      "file": "docs/ROADMAP.md",
+      "line": 43,
+      "tag": "Empirical/Declared"
+    },
+    {
+      "anchor": "roadmap--mcp-tools-current-keep-stable",
+      "family": "doc",
+      "kind": "section",
+      "title": "MCP tools (current — keep stable)",
+      "file": "docs/ROADMAP.md",
+      "line": 45,
+      "tag": "Empirical/Declared",
+      "summary": "Envelope: JSON-RPC MCP; result includes findings list, severity, safe: bool, optional redacted text."
+    },
+    {
+      "anchor": "roadmap--planned-mcp-tools-wave-b",
+      "family": "doc",
+      "kind": "section",
+      "title": "Planned MCP tools (Wave B)",
+      "file": "docs/ROADMAP.md",
+      "line": 58,
+      "tag": "Empirical/Declared",
+      "summary": "POST /v1/screen"
+    },
+    {
+      "anchor": "roadmap--http-planned-auth",
+      "family": "doc",
+      "kind": "section",
+      "title": "HTTP (planned auth)",
+      "file": "docs/ROADMAP.md",
+      "line": 65,
+      "tag": "Empirical/Declared",
+      "summary": "POST /v1/screen"
+    },
+    {
+      "anchor": "roadmap--rust-library-stable-intent",
+      "family": "doc",
+      "kind": "section",
+      "title": "Rust library (stable intent)",
+      "file": "docs/ROADMAP.md",
+      "line": 76,
+      "tag": "Empirical/Declared",
+      "summary": "// Conceptual — keep ScreeningPipeline public"
+    },
+    {
+      "anchor": "roadmap--pr-plan",
+      "family": "doc",
+      "kind": "section",
+      "title": "PR plan",
+      "file": "docs/ROADMAP.md",
+      "line": 86,
+      "tag": "Empirical/Declared",
+      "summary": "1. Docs assessment + roadmap (this)"
+    },
+    {
+      "anchor": "roadmap--non-goals",
+      "family": "doc",
+      "kind": "section",
+      "title": "Non-goals",
+      "file": "docs/ROADMAP.md",
+      "line": 96,
+      "tag": "Empirical/Declared",
+      "summary": "- Replacing gitleaks / cargo-audit / trivy"
+    },
+    {
+      "anchor": "changelog",
+      "family": "changelog",
+      "kind": "entry",
+      "title": "Changelog",
+      "file": "CHANGELOG.md",
+      "line": 1,
+      "tag": "Empirical/Declared",
+      "summary": "All notable changes to security-mcp will be documented in this file."
+    },
+    {
+      "anchor": "changelog--unreleased",
+      "family": "changelog",
+      "kind": "section",
+      "title": "[Unreleased]",
+      "file": "CHANGELOG.md",
+      "line": 8,
+      "tag": "Empirical/Declared",
+      "summary": "- LICENSE file (MIT, matching Cargo.toml's declared license)."
+    },
+    {
+      "anchor": "changelog--added",
+      "family": "changelog",
+      "kind": "section",
+      "title": "Added",
+      "file": "CHANGELOG.md",
+      "line": 10,
+      "tag": "Empirical/Declared",
+      "summary": "- LICENSE file (MIT, matching Cargo.toml's declared license)."
+    },
+    {
+      "anchor": "changelog--changed",
+      "family": "changelog",
+      "kind": "section",
+      "title": "Changed",
+      "file": "CHANGELOG.md",
+      "line": 16,
+      "tag": "Empirical/Declared",
+      "summary": "- README: clarified this is a content/text screener (regex + entropy"
+    },
+    {
+      "anchor": "changelog--0.1.0-alpha.2-2025-01-22",
+      "family": "changelog",
+      "kind": "section",
+      "title": "[0.1.0-alpha.2] - 2025-01-22",
+      "file": "CHANGELOG.md",
+      "line": 21,
+      "tag": "Empirical/Declared",
+      "summary": "- BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp"
+    },
+    {
+      "anchor": "changelog--changed-2",
+      "family": "changelog",
+      "kind": "section",
+      "title": "Changed",
+      "file": "CHANGELOG.md",
+      "line": 23,
+      "tag": "Empirical/Declared",
+      "summary": "- BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp"
+    },
+    {
+      "anchor": "changelog--fixed",
+      "family": "changelog",
+      "kind": "section",
+      "title": "Fixed",
+      "file": "CHANGELOG.md",
+      "line": 30,
+      "tag": "Empirical/Declared",
+      "summary": "- Pattern matching for \"disregard all\" variant of prompt injection"
+    },
+    {
+      "anchor": "changelog--0.1.0-alpha.1-2025-01-19",
+      "family": "changelog",
+      "kind": "section",
+      "title": "[0.1.0-alpha.1] - 2025-01-19",
+      "file": "CHANGELOG.md",
+      "line": 34,
+      "tag": "Empirical/Declared",
+      "summary": "- Initial security MCP server implementation"
+    },
+    {
+      "anchor": "changelog--added-2",
+      "family": "changelog",
+      "kind": "section",
+      "title": "Added",
+      "file": "CHANGELOG.md",
+      "line": 36,
+      "tag": "Empirical/Declared",
+      "summary": "- Initial security MCP server implementation"
+    }
+  ],
+  "flagged": []
+}

@@ -62,3 +62,7 @@
 - **Library:** Rust only; Python cabal uses MCP client pattern (like Tero).
 
 See [ROADMAP.md](ROADMAP.md).
+
+## Tero index
+
+Layer-1 citation index: [docs/tero-index/](tero-index/) (`index.json`, `INDEX.md`, `MANIFEST.toml`).
