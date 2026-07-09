@@ -3,13 +3,13 @@
 > **Honesty:** Empirical/Declared — lite heading/line heuristic over markdown in security-mcp via tero-mcp/scripts/generate_lite_index.py; source files are ground truth. Generated 2026-07-09.
 > Use this index to find where to Read, not as authoritative ground truth.
 
-- **Items:** 59
+- **Items:** 61
 - **Flagged:** 0
 - **item_tag:** `Empirical/Declared`
 - **Machine index:** [`index.json`](./index.json)
 - **Manifest:** [`MANIFEST.toml`](./MANIFEST.toml)
 
-## doc (50 entries)
+## doc (51 entries)
 
 | Anchor | Kind | Id | Title | File:Line | Status | Summary |
 |---|---|---|---|---|---|---|
@@ -19,6 +19,7 @@
 | `agents--working-with-cabal-devmelopner-agent-tool` | section | — | Working with cabal-devmelopner agent tool | `AGENTS.md:24` | — | This project is prepared for integration: |
 | `agents--local-checks` | section | — | Local checks | `AGENTS.md:36` | — | Look for: |
 | `agents--further-reading` | section | — | Further reading | `AGENTS.md:44` | — | - README.md |
+| `agents--post-landing-status-plan.md-p1` | section | — | Post-landing status (plan.md p1) | `AGENTS.md:54` | — | - chore/tero-index-cabal-ready + hygiene landed to dev (merge 2c4f5f5) then main (91bf4f9) --no-ff; tero update committed. |
 | `contributing` | section | — | Contributing to This Project | `CONTRIBUTING.md:1` | — | Thank you for your interest in contributing! |
 | `contributing--development-setup` | section | — | Development Setup | `CONTRIBUTING.md:5` | — | 1. Clone the repository |
 | `contributing--pull-request-process` | section | — | Pull Request Process | `CONTRIBUTING.md:12` | — | 1. Fork the repository |
@@ -64,7 +65,7 @@
 | `readme--or-if-tero-mcp-is-a-sibling` | other | — | or if tero-mcp is a sibling: | `docs/tero-index/README.md:17` | — | python3 ../tero-mcp/scripts/generateliteindex.py --root $(pwd) |
 | `readme--serve-locally` | section | — | Serve locally | `docs/tero-index/README.md:21` | — | export TEROTOKENS=local-dev:refresh |
 
-## changelog (9 entries)
+## changelog (10 entries)
 
 | Anchor | Kind | Id | Title | File:Line | Status | Summary |
 |---|---|---|---|---|---|---|
@@ -72,9 +73,10 @@
 | `changelog--unreleased` | section | — | [Unreleased] | `CHANGELOG.md:8` | — | - LICENSE file (MIT, matching Cargo.toml's declared license). |
 | `changelog--added` | section | — | Added | `CHANGELOG.md:10` | — | - LICENSE file (MIT, matching Cargo.toml's declared license). |
 | `changelog--changed` | section | — | Changed | `CHANGELOG.md:16` | — | - README: clarified this is a content/text screener (regex + entropy |
-| `changelog--0.1.0-alpha.2-2025-01-22` | section | — | [0.1.0-alpha.2] - 2025-01-22 | `CHANGELOG.md:21` | — | - BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp |
-| `changelog--changed-2` | section | — | Changed | `CHANGELOG.md:23` | — | - BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp |
-| `changelog--fixed` | section | — | Fixed | `CHANGELOG.md:30` | — | - Pattern matching for "disregard all" variant of prompt injection |
-| `changelog--0.1.0-alpha.1-2025-01-19` | section | — | [0.1.0-alpha.1] - 2025-01-19 | `CHANGELOG.md:34` | — | - Initial security MCP server implementation |
-| `changelog--added-2` | section | — | Added | `CHANGELOG.md:36` | — | - Initial security MCP server implementation |
+| `changelog--chore-hygiene-plan.md-priority-1` | section | — | Chore / Hygiene (plan.md priority 1) | `CHANGELOG.md:21` | — | - Landed chore/tero-index-cabal-ready (AGENTS.md, deny.toml, tero-index regen, scripts/check.sh parity, LOCALCHECKS, CI, W2 mentions) via dev then main using -… |
+| `changelog--0.1.0-alpha.2-2025-01-22` | section | — | [0.1.0-alpha.2] - 2025-01-22 | `CHANGELOG.md:26` | — | - BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp |
+| `changelog--changed-2` | section | — | Changed | `CHANGELOG.md:28` | — | - BREAKING: Renamed crate from embeddenator-security-mcp to security-mcp |
+| `changelog--fixed` | section | — | Fixed | `CHANGELOG.md:35` | — | - Pattern matching for "disregard all" variant of prompt injection |
+| `changelog--0.1.0-alpha.1-2025-01-19` | section | — | [0.1.0-alpha.1] - 2025-01-19 | `CHANGELOG.md:39` | — | - Initial security MCP server implementation |
+| `changelog--added-2` | section | — | Added | `CHANGELOG.md:41` | — | - Initial security MCP server implementation |
 

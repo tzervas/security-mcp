@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   heuristics), explicitly **not** a repository/dependency/supply-chain
   scanner, and not a substitute for `cargo audit`/`gitleaks`/`semgrep`/`trivy`.
 
+### Chore / Hygiene (plan.md priority 1)
+- Landed `chore/tero-index-cabal-ready` (AGENTS.md, deny.toml, tero-index regen, scripts/check.sh parity, LOCAL_CHECKS, CI, W2 mentions) via dev then main using --no-ff merges.
+- Followed: tero-first queries, ./scripts/check.sh (green), /root/git/scripts/update-tero.sh, signed commits (-S), branch dev/main propagate.
+- Tero cite (from text_search "AGENTS"): AGENTS.md:2 "Use Tero + cabal-devmelopner for work here." + CHANGELOG.md:8 section.
+
 ## [0.1.0-alpha.2] - 2025-01-22
 
 ### Changed

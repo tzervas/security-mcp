@@ -51,3 +51,9 @@ Run checks before considering work complete.
 
 Leave mycelium isolated; all coordination here targets the other repos + cabal.
 
+## Post-landing status (plan.md p1)
+- chore/tero-index-cabal-ready + hygiene landed to dev (merge 2c4f5f5) then main (91bf4f9) --no-ff; tero update committed.
+- dev/main now synced at land commit (91bf4f9).
+- Tero cite: AGENTS.md:2 (and query results confirm "AGENTS" hit post-index).
+- Always run checks + tero before edits; use signed commits, dev->main --no-ff flow.
+
