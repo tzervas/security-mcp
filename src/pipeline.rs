@@ -289,7 +289,7 @@ impl ScreeningPipeline {
             .iter()
             .filter(|f| f.action == SuggestedAction::Redact)
             .collect();
-        sorted_findings.sort_by(|a, b| b.start.cmp(&a.start));
+        sorted_findings.sort_by_key(|b| std::cmp::Reverse(b.start));
 
         for finding in sorted_findings {
             if finding.end <= redacted.len() {
