@@ -90,3 +90,4 @@ MIT
 
 - [Assessment & gaps](docs/ASSESSMENT.md)
 - [Product roadmap & API plans](docs/ROADMAP.md)
+v0.1.0 per plan + user (toolchain/dev support first).

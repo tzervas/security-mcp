@@ -57,3 +57,6 @@ Leave mycelium isolated; all coordination here targets the other repos + cabal.
 - Tero cite: AGENTS.md:2 (and query results confirm "AGENTS" hit post-index).
 - Always run checks + tero before edits; use signed commits, dev->main --no-ff flow.
 
+Semver baseline v0.1.0 for this dev support/toolchain component (extracted from mycelium; language/project agnostic dev tooling).
+See plan.md. Local GHCR pref. No mycelium mods (read-only extract).
+Cites: plan, tero (dev support), user directive on toolchain first.
