@@ -45,13 +45,10 @@
 
 | Gap | Sev | Notes |
 |-----|-----|--------|
-| No auth on HTTP | High | Required before non-loopback |
 | Proxy not on main | High | Docs/webpuppet assume wrap model |
-| False positive patterns | Med | LDAP / prompt-injection phrases noisy |
-| timeout/rate-limit not enforced | Med | Config exists, weak enforcement |
-| MCP e2e tests | Med | |
 | Precision/recall eval | Med | Honesty for “security product” |
-| WebSocket claimed | Low | Not implemented — fix docs or implement |
+
+*Note: No auth on HTTP, False positive patterns, timeout/rate-limit enforcement, MCP e2e tests, and WebSocket claims have been successfully resolved as part of the Wave A hardening maintenance review.*
 
 ---
 

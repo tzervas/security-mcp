@@ -185,9 +185,9 @@ impl ScreeningPipeline {
 
         // Run detectors (parallel or sequential based on content size)
         let combined = if content.len() > self.config.parallel_threshold {
-            self.run_parallel(content)
+            self.run_parallel(content, start)?
         } else {
-            self.run_sequential(content)
+            self.run_sequential(content, start)?
         };
 
         // Filter by minimum severity
@@ -225,7 +225,15 @@ impl ScreeningPipeline {
     }
 
     /// Run detectors in parallel
-    fn run_parallel(&self, content: &str) -> DetectorResult {
+    fn run_parallel(
+        &self,
+        content: &str,
+        start_time: std::time::Instant,
+    ) -> SecurityResult<DetectorResult> {
+        if start_time.elapsed().as_millis() as u64 > self.config.timeout_ms {
+            return Err(SecurityError::Timeout);
+        }
+
         let results: Vec<DetectorResult> = self
             .detectors
             .par_iter()
@@ -237,18 +245,30 @@ impl ScreeningPipeline {
         for result in results {
             combined.merge(result);
         }
-        combined
+
+        if start_time.elapsed().as_millis() as u64 > self.config.timeout_ms {
+            return Err(SecurityError::Timeout);
+        }
+
+        Ok(combined)
     }
 
     /// Run detectors sequentially
-    fn run_sequential(&self, content: &str) -> DetectorResult {
+    fn run_sequential(
+        &self,
+        content: &str,
+        start_time: std::time::Instant,
+    ) -> SecurityResult<DetectorResult> {
         let mut combined = DetectorResult::empty();
         for detector in &self.detectors {
+            if start_time.elapsed().as_millis() as u64 > self.config.timeout_ms {
+                return Err(SecurityError::Timeout);
+            }
             if detector.is_enabled() {
                 combined.merge(detector.detect(content));
             }
         }
-        combined
+        Ok(combined)
     }
 
     /// Determine verdict based on findings
@@ -357,5 +377,17 @@ mod tests {
             .unwrap();
 
         assert_eq!(result.verdict, Verdict::Blocked);
+    }
+
+    #[test]
+    fn test_screening_timeout() {
+        let config = ScreeningConfig {
+            timeout_ms: 0, // Instant timeout
+            ..Default::default()
+        };
+        let pipeline = ScreeningPipeline::new(config);
+        let result = pipeline.screen("Some content to scan", ScreeningDirection::Output);
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), SecurityError::Timeout));
     }
 }

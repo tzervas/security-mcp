@@ -68,12 +68,21 @@ struct Args {
     /// Allow redacted content through
     #[arg(long, default_value = "true")]
     allow_redacted: bool,
+
+    /// Rate limit in requests per second (0 for unlimited, HTTP mode only)
+    #[arg(long, default_value = "100", env = "SECURITY_MCP_RATE_LIMIT")]
+    rate_limit: usize,
+
+    /// Comma-separated list of valid security tokens for HTTP mode (env: SECURITY_MCP_TOKENS)
+    #[arg(long, env = "SECURITY_MCP_TOKENS")]
+    tokens: Option<String>,
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Initialize tracing
+    // Initialize tracing, sending logs to stderr so stdout is clean for the MCP stdio protocol
     tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
         .with_env_filter(
             tracing_subscriber::EnvFilter::from_default_env()
                 .add_directive(tracing::Level::INFO.into()),
@@ -99,11 +108,20 @@ async fn main() -> anyhow::Result<()> {
         blocked_message: "Content blocked due to security policy".to_string(),
     };
 
+    let parsed_tokens = args.tokens.map(|s| {
+        s.split(',')
+            .map(|t| t.trim().to_string())
+            .filter(|t| !t.is_empty())
+            .collect::<Vec<String>>()
+    });
+
     let server_config = ServerConfig {
         host: args.host,
         port: args.port,
         screening: screening_config,
         policy,
+        rate_limit: args.rate_limit,
+        tokens: parsed_tokens,
     };
 
     if args.stdio {
