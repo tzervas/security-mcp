@@ -23,8 +23,8 @@
 | Dimension | Score | Notes |
 |-----------|-------|--------|
 | Core detectors | **3** | Useful heuristics; FP/FN expected |
-| MCP surface | **3** | Tools exist; e2e MCP tests thin |
-| Auth / multi-tenant | **1** | No token auth on HTTP |
+| MCP surface | **4** | Tools exist; comprehensive E2E stdio integration tests in place |
+| Auth / multi-tenant | **4** | Token auth implemented and enforced on remote bind |
 | Proxy / wrap-other-tools | **1** on main | **Paused on `security-proxy-integration`** |
 | Docs honesty | **4** | Scope mostly clear after public-ready pass |
 | Cabal Production load-bearing | **2** | Optional peer only until hardened |
