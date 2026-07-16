@@ -11,13 +11,13 @@ Companion: [ASSESSMENT.md](ASSESSMENT.md).
 
 ### Wave A — Harden what exists
 
-| ID | Work | Exit |
-|----|------|------|
-| S-A1 | Token auth for HTTP (`SECURITY_MCP_TOKENS` or bearer) | Unauthenticated remote bind rejected |
-| S-A2 | MCP stdio e2e tests | CI covers tools/call |
-| S-A3 | Fix WebSocket claim (implement or delete from README) | Docs = code |
-| S-A4 | Config: enforce timeout_ms + simple rate limit | No dead knobs |
-| S-A5 | FP triage pass on noisiest patterns | Document expected FP rate |
+| ID | Work | Exit | Status |
+|----|------|------|--------|
+| S-A1 | Token auth for HTTP (`SECURITY_MCP_TOKENS` or bearer) | Unauthenticated remote bind rejected | **Completed** |
+| S-A2 | MCP stdio e2e tests | CI covers tools/call | **Completed** |
+| S-A3 | Fix WebSocket claim (implement or delete from README) | Docs = code | **Completed** (Claims cleaned up) |
+| S-A4 | Config: enforce timeout_ms + simple rate limit | No dead knobs | **Completed** |
+| S-A5 | FP triage pass on noisiest patterns | Document expected FP rate | **Completed** |
 
 ### Wave B — Proxy / wrap path (from paused branch)
 
