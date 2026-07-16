@@ -130,7 +130,7 @@ lazy_static! {
 
     /// LDAP injection
     pub static ref LDAP_INJECTION: Regex = Regex::new(
-        r"[*)(|&!]"
+        r"(?:\([|&!]\s*\(|\)\s*\([|&!]\s*|\)\s*\([a-zA-Z0-9_]+=\*?\))"
     ).unwrap();
 
     /// XML/XXE injection

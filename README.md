@@ -19,7 +19,7 @@ Alpha / under active development. Rules and thresholds will evolve.
 
 ## What It Does Today (Code-Backed)
 
-- Runs an MCP-compatible JSON-RPC server over HTTP/WebSocket.
+- Runs an MCP-compatible JSON-RPC server over HTTP or stdio.
 - Screens text in two directions:
   - **Input screening** (prompt-injection patterns, suspicious encodings)
   - **Output screening** (PII/secrets patterns, high-entropy tokens)
@@ -81,6 +81,18 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+## False Positive Triage & Expected Rates
+
+This tool uses heuristic rules (regex pattern matching and entropy metrics) to flag potential security threats during an active conversation. Some false positives are expected as part of standard operations.
+
+| Detector Category | Expected False Positive Rate | Common Causes of False Positives | Triage Instructions / Recommendation |
+|---|---|---|---|
+| **PII Detection** | **Low to Medium** | Formatted street addresses, personal names, generic email domains in examples. | Lower severity thresholds or disable specific checkers if operating in public/tutorial contexts. |
+| **Secrets & Keys** | **Medium** | High-entropy strings (hashes, Base64 chunks, git SHAs, build artifacts) in technical texts. | Use explicit secret matching or adjust the entropy threshold when working with highly technical domains. |
+| **SQL / Cmd Injection** | **Low** | Code snippets, SQL tutorials, or terminal command examples. | Mark as Warning/Review instead of Block for trusted developer workflows. |
+| **LDAP Injection** | **Extremely Low** | The LDAP detector is heavily refined to target specific nested LDAP query structures instead of single special characters like `!` or `*`. | Safely allow single occurrences of special characters. |
+| **Prompt Injection** | **Medium** | Documentation explaining prompt injection, or tutorials containing typical jailbreak instruction phrasing. | Review flagged inputs manually or bypass screening for administrative prompts. |
 
 ## License
 

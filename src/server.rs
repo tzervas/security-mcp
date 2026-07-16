@@ -7,7 +7,49 @@ use axum::{
     Router,
 };
 use serde_json::{json, Value};
+use std::collections::HashMap;
 use std::sync::Arc;
+use std::sync::Mutex;
+use std::time::{Duration, Instant};
+
+/// Thread-safe sliding-window rate limiter
+pub struct RateLimiter {
+    requests: Mutex<HashMap<String, Vec<Instant>>>,
+    limit_per_second: usize,
+}
+
+impl RateLimiter {
+    /// Create a new RateLimiter
+    pub fn new(limit_per_second: usize) -> Self {
+        Self {
+            requests: Mutex::new(HashMap::new()),
+            limit_per_second,
+        }
+    }
+
+    /// Check if the key has exceeded the rate limit
+    pub fn check(&self, key: &str) -> bool {
+        if self.limit_per_second == 0 {
+            return true; // 0 means unlimited
+        }
+
+        let mut requests = self.requests.lock().unwrap();
+        let now = Instant::now();
+        let window_start = now - Duration::from_secs(1);
+
+        let timestamps = requests.entry(key.to_string()).or_default();
+
+        // Retain only timestamps within the last second
+        timestamps.retain(|&t| t > window_start);
+
+        if timestamps.len() >= self.limit_per_second {
+            false
+        } else {
+            timestamps.push(now);
+            true
+        }
+    }
+}
 
 use crate::error::SecurityResult;
 use crate::pipeline::ScreeningConfig;
@@ -25,6 +67,8 @@ pub struct ServerConfig {
     pub port: u16,
     pub screening: ScreeningConfig,
     pub policy: ScreeningPolicy,
+    pub rate_limit: usize,
+    pub tokens: Option<Vec<String>>,
 }
 
 impl Default for ServerConfig {
@@ -34,6 +78,8 @@ impl Default for ServerConfig {
             port: 3001,
             screening: ScreeningConfig::default(),
             policy: ScreeningPolicy::default(),
+            rate_limit: 100,
+            tokens: None,
         }
     }
 }
@@ -41,6 +87,8 @@ impl Default for ServerConfig {
 /// Server state
 pub struct ServerState {
     tools: Arc<ToolRegistry>,
+    pub rate_limiter: RateLimiter,
+    pub tokens: Option<Vec<String>>,
 }
 
 impl ServerState {
@@ -50,6 +98,8 @@ impl ServerState {
                 config.screening.clone(),
                 config.policy.clone(),
             )),
+            rate_limiter: RateLimiter::new(config.rate_limit),
+            tokens: config.tokens.clone(),
         }
     }
 }
@@ -81,8 +131,34 @@ impl SecurityServer {
             .with_state(self.state.clone())
     }
 
+    /// Check if binding to non-loopback address is secure
+    fn check_bind_safety(&self) -> SecurityResult<()> {
+        let is_loopback = self.config.host == "127.0.0.1"
+            || self.config.host == "localhost"
+            || self.config.host == "::1";
+
+        if !is_loopback {
+            let has_tokens = self
+                .config
+                .tokens
+                .as_ref()
+                .map(|t| !t.is_empty())
+                .unwrap_or(false);
+            let allow_insecure = std::env::var("ALLOW_INSECURE_BIND").unwrap_or_default() == "1";
+
+            if !has_tokens && !allow_insecure {
+                return Err(crate::error::SecurityError::ConfigError(
+                    "Refusing to bind to non-loopback address without SECURITY_MCP_TOKENS or ALLOW_INSECURE_BIND=1".to_string()
+                ));
+            }
+        }
+        Ok(())
+    }
+
     /// Run the server
     pub async fn run(&self) -> SecurityResult<()> {
+        self.check_bind_safety()?;
+
         let addr = format!("{}:{}", self.config.host, self.config.port);
         let listener = tokio::net::TcpListener::bind(&addr)
             .await
@@ -115,10 +191,44 @@ async fn health() -> impl IntoResponse {
 /// Handle MCP request
 async fn handle_mcp_request(
     State(state): State<Arc<ServerState>>,
+    headers: axum::http::HeaderMap,
     Json(request): Json<JsonRpcRequest>,
 ) -> impl IntoResponse {
+    // Check token authentication if configured
+    if let Some(ref allowed_tokens) = state.tokens {
+        let mut authenticated = false;
+        if let Some(auth_header) = headers.get(axum::http::header::AUTHORIZATION) {
+            if let Ok(auth_str) = auth_header.to_str() {
+                if let Some(token) = auth_str.strip_prefix("Bearer ") {
+                    let token = token.trim();
+                    if allowed_tokens.iter().any(|t| t == token) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+        if !authenticated {
+            return (
+                axum::http::StatusCode::UNAUTHORIZED,
+                Json(json!({
+                    "error": "Unauthorized. Please provide a valid Bearer token in the Authorization header."
+                })),
+            ).into_response();
+        }
+    }
+
+    if !state.rate_limiter.check("global") {
+        return (
+            axum::http::StatusCode::TOO_MANY_REQUESTS,
+            Json(json!({
+                "error": "Rate limit exceeded. Please try again later."
+            })),
+        )
+            .into_response();
+    }
+
     let response = process_request(&state, request).await;
-    Json(response)
+    Json(response).into_response()
 }
 
 /// Process MCP request
@@ -240,5 +350,69 @@ impl StdioTransport {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rate_limiter() {
+        let limiter = RateLimiter::new(2);
+        // First request: ok
+        assert!(limiter.check("client_1"));
+        // Second request: ok
+        assert!(limiter.check("client_1"));
+        // Third request: rate limited!
+        assert!(!limiter.check("client_1"));
+
+        // Different client should not be affected
+        assert!(limiter.check("client_2"));
+    }
+
+    #[test]
+    fn test_bind_safety_all_cases() {
+        // Since std::env is global, we test all cases sequentially in one test to avoid race conditions.
+
+        // 1. Loopback should always succeed
+        let config = ServerConfig {
+            host: "127.0.0.1".to_string(),
+            ..Default::default()
+        };
+        let server = SecurityServer::new(config);
+        assert!(server.check_bind_safety().is_ok());
+
+        // 2. Remote should fail without tokens/env
+        std::env::remove_var("ALLOW_INSECURE_BIND");
+        let config = ServerConfig {
+            host: "0.0.0.0".to_string(),
+            tokens: None,
+            ..Default::default()
+        };
+        let server = SecurityServer::new(config);
+        assert!(server.check_bind_safety().is_err());
+
+        // 3. Remote should succeed with tokens
+        let config = ServerConfig {
+            host: "0.0.0.0".to_string(),
+            tokens: Some(vec!["my-token".to_string()]),
+            ..Default::default()
+        };
+        let server = SecurityServer::new(config);
+        assert!(server.check_bind_safety().is_ok());
+
+        // 4. Remote should succeed with ALLOW_INSECURE_BIND=1
+        std::env::set_var("ALLOW_INSECURE_BIND", "1");
+        let config = ServerConfig {
+            host: "0.0.0.0".to_string(),
+            tokens: None,
+            ..Default::default()
+        };
+        let server = SecurityServer::new(config);
+        assert!(server.check_bind_safety().is_ok());
+
+        // Cleanup
+        std::env::remove_var("ALLOW_INSECURE_BIND");
     }
 }
