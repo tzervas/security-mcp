@@ -7,21 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7-alpha] - 2026-07-16
+
 ### Added
-- `LICENSE` file (MIT, matching `Cargo.toml`'s declared license).
-- `tests/smoke.rs`: black-box integration smoke tests against the public API
-  (known secret is flagged, benign string is not, default config enables all
-  detectors).
+- 5-minute path in README (`cargo build` / `cargo test` / `security-mcp --stdio`).
+- MCP host examples: `docs/mcp.example.json` (Claude Desktop), `.mcp.json.example` (Cursor / VS Code).
+- `CLAUDE.md` with cargo / check.sh command surface for agents.
+- Optional `.pre-commit-config.yaml` (fmt + pre-push full `scripts/check.sh`); primary gate remains `./scripts/check.sh`.
 
 ### Changed
-- README: clarified this is a content/text screener (regex + entropy
-  heuristics), explicitly **not** a repository/dependency/supply-chain
-  scanner, and not a substitute for `cargo audit`/`gitleaks`/`semgrep`/`trivy`.
+- `scripts/check.sh` and `docs/LOCAL_CHECKS.md` note pre-commit as optional convenience.
+- Version bump `0.1.6-alpha` → `0.1.7-alpha` (docs / agent-surface production polish).
 
-### Chore / Hygiene (plan.md priority 1)
-- Landed `chore/tero-index-cabal-ready` (AGENTS.md, deny.toml, tero-index regen, scripts/check.sh parity, LOCAL_CHECKS, CI, W2 mentions) via dev then main using --no-ff merges.
-- Followed: tero-first queries, ./scripts/check.sh (green), /root/git/scripts/update-tero.sh, signed commits (-S), branch dev/main propagate.
-- Tero cite (from text_search "AGENTS"): AGENTS.md:2 "Use Tero + cabal-devmelopner for work here." + CHANGELOG.md:8 section.
+### Prior unreleased notes (landed earlier on main)
+- `LICENSE` file (MIT, matching `Cargo.toml`'s declared license).
+- `tests/smoke.rs`: black-box integration smoke tests against the public API.
+- README: clarified content/text screener (not repo/CVE scanner).
+- Chore: tero-index / AGENTS / local CI parity hygiene.
 
 ## [0.1.0-alpha.2] - 2025-01-22
 
@@ -53,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable severity thresholds
 - Risk scoring and automated blocking
 
-[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.1.7-alpha...HEAD
+[0.1.7-alpha]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.2...v0.1.7-alpha
 [0.1.0-alpha.2]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/tzervas/security-mcp/releases/tag/v0.1.0-alpha.1

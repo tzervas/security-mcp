@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "security-mcp": {
+      "type": "stdio",
+      "command": "security-mcp",
+      "args": ["--stdio"]
+    }
+  }
+}
