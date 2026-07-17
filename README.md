@@ -1,5 +1,10 @@
 # security-mcp
 
+<!-- FLEET-BADGES:BEGIN -->
+[![CI](https://github.com/tzervas/security-mcp/actions/workflows/fleet-ci.yml/badge.svg?branch=main)](https://github.com/tzervas/security-mcp/actions/workflows/fleet-ci.yml?query=branch%3Amain)
+[![Security](https://github.com/tzervas/security-mcp/actions/workflows/fleet-security.yml/badge.svg?branch=main)](https://github.com/tzervas/security-mcp/actions/workflows/fleet-security.yml?query=branch%3Amain)
+<!-- FLEET-BADGES:END -->
+
 MCP server for security screening: prompt-injection defense, PII detection, and secrets scanning
 **in text content passed through an MCP conversation** (tool calls, model input/output).
 
