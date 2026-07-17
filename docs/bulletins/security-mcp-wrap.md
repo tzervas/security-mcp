@@ -2,9 +2,9 @@
 
 **Status:** DRAFT  
 **Bulletin ID:** `security-mcp/wrap`  
-**Merged to `main`:** PR [#28](https://github.com/tzervas/security-mcp/pull/28) (`fd24164` at evidence time)  
+**Merged to `main`:** PR [#28](https://github.com/tzervas/security-mcp/pull/28) (`fd24164`); bulletin honesty PR [#29](https://github.com/tzervas/security-mcp/pull/29) on `main` (`ce60fc7` at P17 evidence time)  
 **Date:** 2026-07-16  
-**Post-merge note:** Code ships on `main`; **Status stays DRAFT** until STABLE promotion checklist below is complete (real child MCP integration tests, consumer acks, human STABLE sign-off).  
+**Post-merge note:** Code ships on `main`; **Status stays DRAFT** until STABLE promotion checklist below is complete (real child MCP integration tests, remaining consumer acks, human STABLE sign-off).
 **Source branch triage:** `origin/security-proxy-integration` (cherry-picked concepts, not a blind merge)
 
 ## Summary
@@ -55,24 +55,21 @@ Optional **wrap mode** forwards MCP JSON-RPC to a **child MCP server** over newl
 ./scripts/check.sh
 ```
 
-## STABLE-candidate (branch evidence only)
+## STABLE promotion checklist (DRAFT → STABLE)
 
-Use when feat branch + local-ci are green and human review is in progress. **Not STABLE** — consumers must not treat this as a pinned contract on `main`.
+**Status field remains DRAFT** until every **open** item below is satisfied and a human sets **STABLE**.
 
-- [ ] PR open: `feat/security-proxy-wrap` → `main` (draft OK until review complete)
-- [ ] `./scripts/check.sh` green on PR head SHA
-- [ ] DRAFT bulletin committed on the same branch as the PR
-- [ ] Evidence log under workspace `plans/evidence/48h/` (e.g. `S2-security-wrap-candidate.md`)
-- [ ] Optional: set bulletin note **STABLE-candidate** in evidence only; **Status** field stays **DRAFT** until main merge
+### Completed (main evidence)
 
-## Promotion to STABLE
+- [x] Wrap feature merged to `main` via PR [#28](https://github.com/tzervas/security-mcp/pull/28) (human promote)
+- [x] DRAFT bulletin on `main`; post-merge honesty in PR [#29](https://github.com/tzervas/security-mcp/pull/29)
+- [x] `./scripts/check.sh` green on `main` at merge lineage (`ce60fc7` — re-run before STABLE sign-off if `main` advances)
+- [x] **Consumer acknowledgment (webpuppet family):** [webpuppet-rs PR #34](https://github.com/tzervas/webpuppet-rs/pull/34) (SECURITY.md / readiness hooks); [webpuppet-rs-mcp PR #26](https://github.com/tzervas/webpuppet-rs-mcp/pull/26) (Depends-on `security-mcp/wrap`@DRAFT). Producer does not edit consumer trees; acks recorded in consumer PRs per P10 evidence.
 
-All items required before changing **Status** from **DRAFT** → **STABLE**:
+### Open (block STABLE)
 
-- [ ] Human promote: PR merged to `main` (no autonomous merge)
-- [ ] `./scripts/check.sh` green on `main` at the merge commit
-- [ ] Wrap integration tests exercise a **real** child MCP process (not router/scaffold-only)
+- [ ] Wrap integration tests exercise a **real** child MCP process (not router/scaffold-only); see `tests/proxy_integration.rs` stub `real_child_mcp_stdio_roundtrip` (ignored until fixture binary lands)
+- [ ] **Consumer acknowledgment:** **agent-mcp** (and any other fleet consumers not yet acked) record acceptance in their repos
 - [ ] Semver / CHANGELOG updated if wire or CLI contract changed since last tag
-- [ ] **Consumer acknowledgment:** downstream owners (at minimum **webpuppet-rs**, **webpuppet-rs-mcp**, **agent-mcp** per fleet graph) record acceptance of `security-mcp/wrap` in their repos (separate PRs; producers do not edit consumer trees)
-- [ ] Evidence path updated with post-merge SHA and consumer-ack links or issue refs
+- [ ] Evidence path updated with post-merge SHA and any new consumer-ack links
 - [ ] Reviewer sign-off on bulletin **Status** → **STABLE**
