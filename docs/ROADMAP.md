@@ -23,12 +23,22 @@ Companion: [ASSESSMENT.md](ASSESSMENT.md).
 
 Triage `origin/security-proxy-integration`:
 
-| ID | Work |
-|----|------|
-| S-B1 | Diff branch vs main; cherry-pick viable subprocess/proxy |
-| S-B2 | **API:** `wrap_command` or sidecar mode that screens child MCP stdio |
-| S-B3 | Integration tests with mock child server |
-| S-B4 | Document pairing with webpuppet-rs-mcp |
+| ID | Work | Status |
+|----|------|--------|
+| S-B1 | Diff branch vs main; cherry-pick viable subprocess/proxy | **Completed** |
+| S-B2 | **API:** `wrap_command` or sidecar mode that screens child MCP stdio | **Completed** (`--wrap` and `--wrap-args`) |
+| S-B3 | Integration tests with mock child server | **Completed** (via `tests/proxy_integration.rs`) |
+| S-B4 | Document pairing with webpuppet-rs-mcp | **Completed** (documented below) |
+
+#### Pairing with webpuppet-rs-mcp or other MCP servers
+
+To run `security-mcp` as a transparent, screening sidecar proxy in front of `webpuppet-rs-mcp` (or any other stdio-based MCP server), run `security-mcp` using `--wrap` and `--wrap-args`:
+
+```bash
+security-mcp --wrap webpuppet-rs-mcp --wrap-args --stdio --some-other-arg
+```
+
+This starts `webpuppet-rs-mcp` in the background, intercepting and screening all `tools/call` inputs and outputs dynamically.
 
 ### Wave C — Product quality
 
