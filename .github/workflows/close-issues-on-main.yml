@@ -26,7 +26,8 @@ permissions:
 jobs:
   close-linked:
     name: Close issues for main merge
-    runs-on: [self-hosted, linux, x64, podman]
+    # Meta workflow: GitHub-hosted (issue API only; no product build).
+    runs-on: ubuntu-latest
     if: >
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'pull_request' &&
@@ -35,6 +36,9 @@ jobs:
         github.event.pull_request.base.ref == 'master'))
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Prefer post-merge base so close script is on trunk
+          ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
       - name: Ensure gh
         run: |
           set -euo pipefail
