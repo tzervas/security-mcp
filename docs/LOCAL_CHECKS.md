@@ -9,12 +9,25 @@ Day-to-day quality gates run **locally** so remote CI is not the only source of 
 ./scripts/check.sh
 ```
 
+This is the **primary** quality gate (fmt + clippy `-D warnings` + build + test).
+
 Optional:
 
 ```bash
 ./scripts/check.sh --quick   # skip slower steps (bench/audit when applicable)
 ./scripts/check.sh --fix  # apply formatters instead of --check
 ```
+
+### Optional pre-commit
+
+```bash
+pre-commit install
+pre-commit run --all-files
+```
+
+Config: [`.pre-commit-config.yaml`](../.pre-commit-config.yaml) (whitespace/toml hooks +
+`cargo fmt --check`; full `./scripts/check.sh` on `pre-push`). Pre-commit is convenience —
+`./scripts/check.sh` remains authoritative.
 
 ## Tero index
 

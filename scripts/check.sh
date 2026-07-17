@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 # Local parity with .github/workflows/ci.yml (manual-only remote).
+# Primary quality gate for this repo. Optional git hooks:
+#   pre-commit install   # uses .pre-commit-config.yaml (fmt + pre-push full check)
+# Prefer this script over relying on remote CI alone — see docs/LOCAL_CHECKS.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 MODE="${1:-}"
