@@ -2,8 +2,9 @@
 
 **Status:** DRAFT  
 **Bulletin ID:** `security-mcp/wrap`  
-**Branch:** `feat/security-proxy-wrap` (not merged to `main`)  
+**Merged to `main`:** PR [#28](https://github.com/tzervas/security-mcp/pull/28) (`fd24164` at evidence time)  
 **Date:** 2026-07-16  
+**Post-merge note:** Code ships on `main`; **Status stays DRAFT** until STABLE promotion checklist below is complete (real child MCP integration tests, consumer acks, human STABLE sign-off).  
 **Source branch triage:** `origin/security-proxy-integration` (cherry-picked concepts, not a blind merge)
 
 ## Summary
