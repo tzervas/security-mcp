@@ -30,3 +30,13 @@ async fn server_router_includes_optional_wrap_routes() {
     let server = SecurityServer::new(config);
     let _router = server.router();
 }
+
+/// STABLE gate: spawn a real MCP child over stdio and assert a forwarded `tools/list` (or ping) succeeds.
+/// Enable when a minimal stdio MCP test fixture is checked in or built by `check.sh`.
+#[tokio::test]
+#[ignore = "requires real child MCP binary; router/scaffold tests are not sufficient for STABLE"]
+async fn real_child_mcp_stdio_roundtrip() {
+    // Placeholder: set SECURITY_MCP_WRAP_COMMAND to fixture, send JSON-RPC newline frame, assert response.
+    // Bulletin: docs/bulletins/security-mcp-wrap.md — Promotion checklist.
+    let _ = WrapController::new(None);
+}
