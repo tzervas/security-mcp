@@ -54,8 +54,24 @@ Optional **wrap mode** forwards MCP JSON-RPC to a **child MCP server** over newl
 ./scripts/check.sh
 ```
 
-## Promotion gate (human)
+## STABLE-candidate (branch evidence only)
 
-1. Review PR `feat/security-proxy-wrap` → `main`
-2. Run `./scripts/check.sh` on reviewer machine
-3. Bump bulletin **Status** from DRAFT → STABLE-candidate after sign-off
+Use when feat branch + local-ci are green and human review is in progress. **Not STABLE** — consumers must not treat this as a pinned contract on `main`.
+
+- [ ] PR open: `feat/security-proxy-wrap` → `main` (draft OK until review complete)
+- [ ] `./scripts/check.sh` green on PR head SHA
+- [ ] DRAFT bulletin committed on the same branch as the PR
+- [ ] Evidence log under workspace `plans/evidence/48h/` (e.g. `S2-security-wrap-candidate.md`)
+- [ ] Optional: set bulletin note **STABLE-candidate** in evidence only; **Status** field stays **DRAFT** until main merge
+
+## Promotion to STABLE
+
+All items required before changing **Status** from **DRAFT** → **STABLE**:
+
+- [ ] Human promote: PR merged to `main` (no autonomous merge)
+- [ ] `./scripts/check.sh` green on `main` at the merge commit
+- [ ] Wrap integration tests exercise a **real** child MCP process (not router/scaffold-only)
+- [ ] Semver / CHANGELOG updated if wire or CLI contract changed since last tag
+- [ ] **Consumer acknowledgment:** downstream owners (at minimum **webpuppet-rs**, **webpuppet-rs-mcp**, **agent-mcp** per fleet graph) record acceptance of `security-mcp/wrap` in their repos (separate PRs; producers do not edit consumer trees)
+- [ ] Evidence path updated with post-merge SHA and consumer-ack links or issue refs
+- [ ] Reviewer sign-off on bulletin **Status** → **STABLE**
