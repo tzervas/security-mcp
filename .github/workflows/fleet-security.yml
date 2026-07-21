@@ -35,8 +35,11 @@ jobs:
           elif command -v podman >/dev/null 2>&1; then
             podman run --rm -v "$PWD:/path:ro" docker.io/zricethezav/gitleaks:latest detect --source=/path --verbose --redact
           else
-            echo "gitleaks not available on runner — FAIL (honest security gate)" >&2
-            exit 1
+            echo "gitleaks/docker/podman not pre-installed on runner — downloading native gitleaks..."
+            curl -sSLo gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
+            tar -xzf gitleaks.tar.gz gitleaks
+            chmod +x gitleaks
+            ./gitleaks detect --source . --verbose --redact
           fi
 
   trivy-fs:
