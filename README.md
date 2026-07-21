@@ -10,7 +10,7 @@ MCP server for security screening: prompt-injection defense, PII detection, and 
 
 This crate is intended to sit “in front of” other tools/servers, so inputs and outputs can be screened consistently.
 
-**Status:** Alpha (`0.1.7-alpha`). Heuristic regex + entropy detectors — not a compliance certificate.
+**Status:** Alpha (`0.2.0-alpha`). Heuristic regex + entropy detectors — not a compliance certificate.
 
 ## 5-minute path
 
