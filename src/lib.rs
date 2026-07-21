@@ -21,6 +21,7 @@ pub mod pipeline;
 pub mod protocol;
 pub mod screeners;
 pub mod server;
+pub mod subprocess;
 pub mod tools;
 
 pub use detectors::{Detector, DetectorResult, Finding, Severity};

@@ -24,6 +24,7 @@ use security_mcp::{
     pipeline::ScreeningConfig,
     screeners::ScreeningPolicy,
     server::{SecurityServer, ServerConfig, StdioTransport},
+    subprocess::McpProxyTransport,
     Severity,
 };
 
@@ -76,6 +77,14 @@ struct Args {
     /// Comma-separated list of valid security tokens for HTTP mode (env: SECURITY_MCP_TOKENS)
     #[arg(long, env = "SECURITY_MCP_TOKENS")]
     tokens: Option<String>,
+
+    /// Command to wrap and screen as a child MCP server over stdio
+    #[arg(long)]
+    wrap: Option<String>,
+
+    /// Arguments for the wrapped command
+    #[arg(long, allow_hyphen_values = true, num_args = 1..)]
+    wrap_args: Vec<String>,
 }
 
 #[tokio::main]
@@ -124,7 +133,14 @@ async fn main() -> anyhow::Result<()> {
         tokens: parsed_tokens,
     };
 
-    if args.stdio {
+    if let Some(wrap_command) = args.wrap {
+        tracing::info!(
+            "Starting Security MCP Server in wrap/proxy mode wrapping {}",
+            wrap_command
+        );
+        let transport = McpProxyTransport::new(server_config);
+        transport.run(&wrap_command, &args.wrap_args).await?;
+    } else if args.stdio {
         tracing::info!("Starting Security MCP Server in stdio mode");
         let transport = StdioTransport::new(server_config);
         transport.run().await?;

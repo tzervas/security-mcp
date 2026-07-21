@@ -33,6 +33,22 @@ impl ToolRegistry {
         }
     }
 
+    /// Screen input content (sync)
+    pub fn screen_input_sync(
+        &self,
+        content: &str,
+    ) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
+        self.input_screener.screen(content)
+    }
+
+    /// Screen output content (sync)
+    pub fn screen_output_sync(
+        &self,
+        content: &str,
+    ) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
+        self.output_screener.screen(content)
+    }
+
     /// Get all available tools
     pub fn list_tools(&self) -> Vec<Tool> {
         vec![
