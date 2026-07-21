@@ -1,7 +1,7 @@
 #!/bin/bash
 # scripts/close-linked-issues.sh — Close issues linked by Fixes/Closes/Resolves.
 #
-# Policy (see docs/WORKFLOW.md §0):
+# Policy (see docs/FLEET_STANDARDS.md §0):
 #   - Feature work merges into **dev** and does **not** close issues.
 #   - Issues close only when work reaches **main** (GitHub native auto-close
 #     and/or this script for parity / commit-scan).
@@ -118,7 +118,7 @@ close_one() {
         gh issue close "$issue" --comment "$(cat <<EOF
 Closed via merged PR #${pr} into \`${base}\`.
 
-Issue close policy: only after work reaches **main** (feature merges to \`dev\` leave issues open). See docs/WORKFLOW.md.
+Issue close policy: only after work reaches **main** (feature merges to \`dev\` leave issues open). See docs/FLEET_STANDARDS.md.
 
 ${url}
 EOF

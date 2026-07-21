@@ -31,7 +31,7 @@ jobs:
           if command -v gitleaks >/dev/null 2>&1; then
             gitleaks detect --source . --verbose --redact
           elif command -v docker >/dev/null 2>&1; then
-            docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --source=/path --verbose --redact
+            docker run --rm -v "$PWD:/path:ro" zricethezav/gitleaks:latest detect --source=/path --verbose --redact
           elif command -v podman >/dev/null 2>&1; then
             podman run --rm -v "$PWD:/path:ro" docker.io/zricethezav/gitleaks:latest detect --source=/path --verbose --redact
           else
