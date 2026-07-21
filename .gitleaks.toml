@@ -1,0 +1,11 @@
+# security-mcp embeds detector fixtures for unit tests.
+title = "security-mcp gitleaks"
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Detector unit-test fixtures (not real secrets)"
+paths = [
+  "src/detectors.rs",
+  "tests/.*",
+]
