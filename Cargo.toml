@@ -1,6 +1,6 @@
 [package]
 name = "security-mcp"
-version = "0.1.7-alpha"
+version = "0.2.0-alpha"
 edition = "2021"
 authors = ["Tyler Zervas <tz-dev@vectorweight.com>"]
 license = "MIT"

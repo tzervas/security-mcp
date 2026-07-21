@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0-alpha] - 2026-07-21
+
+### Added
+- Fleet CI standards: PR/issue templates, `fleet-ci.yml`, `fleet-security.yml`, meta issue-close/reopen workflows (`docs/FLEET_STANDARDS.md`).
+
+### Changed
+- CI hardened for self-hosted runners: no bare `sudo apt-get`, pinned gitleaks install, guarded system deps, `CARGO_BUILD_JOBS`/toolchain setup for fleet cargo jobs.
+- gitleaks allowlist scoped to intentional detector-fixture secret shapes (`src/patterns.rs`, smoke tests) so fleet-security scans stay green without masking real findings.
+- Version bump `0.1.7-alpha` → `0.2.0-alpha` (CI/fleet hardening; still alpha — Wave B proxy/wrap path and eval harness remain open per `docs/ROADMAP.md`).
+
 ## [0.1.7-alpha] - 2026-07-16
 
 ### Added
@@ -55,7 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable severity thresholds
 - Risk scoring and automated blocking
 
-[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.1.7-alpha...HEAD
+[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.2.0-alpha...HEAD
+[0.2.0-alpha]: https://github.com/tzervas/security-mcp/compare/v0.1.7-alpha...v0.2.0-alpha
 [0.1.7-alpha]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.2...v0.1.7-alpha
 [0.1.0-alpha.2]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/tzervas/security-mcp/releases/tag/v0.1.0-alpha.1
