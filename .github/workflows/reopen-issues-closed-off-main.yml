@@ -6,7 +6,6 @@ name: reopen-issues-closed-off-main
 on:
   pull_request:
     types: [closed]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,7 +15,8 @@ permissions:
 jobs:
   reopen:
     name: Reopen issues closed off-main
-    runs-on: [self-hosted, linux, x64, podman]
+    # Meta workflow: GitHub-hosted (no product build).
+    runs-on: ubuntu-latest
     if: >
       github.event_name == 'pull_request' &&
       github.event.pull_request.merged == true &&

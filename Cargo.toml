@@ -1,6 +1,6 @@
 [package]
 name = "security-mcp"
-version = "0.1.6-alpha"
+version = "0.1.7-alpha"
 edition = "2021"
 authors = ["Tyler Zervas <tz-dev@vectorweight.com>"]
 license = "MIT"
@@ -12,6 +12,7 @@ categories = ["development-tools", "security"]
 [dependencies]
 # MCP and async runtime
 tokio = { version = "^1.0", features = ["full"] }
+tokio-stream = { version = "^0.1", features = ["sync"] }
 async-trait = "^0.1"
 futures = "^0.3"
 

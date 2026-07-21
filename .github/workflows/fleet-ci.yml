@@ -42,6 +42,10 @@ jobs:
     runs-on: [self-hosted, linux, x64, podman]
     steps:
       - uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
       - name: cargo check
         run: cargo check --workspace --all-targets
       - name: cargo test
@@ -77,7 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           if [ -d tests ] || [ -d test ]; then
-            uv run pytest -q 2>/dev/null || pytest -q 2>/dev/null || echo "pytest failed or missing — mark job fail" >&2
+            uv run pytest -q 2>/dev/null || pytest -q 2>/dev/null || { echo "pytest failed or missing" >&2; exit 1; }
           else
             echo "no tests/ directory — skip"
           fi

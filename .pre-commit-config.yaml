@@ -1,0 +1,32 @@
+# Optional local hooks. Primary quality gate remains ./scripts/check.sh
+# (fmt + clippy -D warnings + build + test) — see docs/LOCAL_CHECKS.md.
+#
+# Install once:  pre-commit install
+# Run all:       pre-commit run --all-files
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt --check
+        entry: cargo fmt -- --check
+        language: system
+        types: [rust]
+        pass_filenames: false
+      - id: cargo-check-script
+        name: scripts/check.sh (fmt/clippy/build/test)
+        entry: ./scripts/check.sh
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

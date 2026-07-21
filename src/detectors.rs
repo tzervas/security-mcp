@@ -443,7 +443,7 @@ mod tests {
     #[test]
     fn test_secret_detector() {
         let detector = SecretDetector::new();
-        let result = detector.detect("My API key is api_key=sk_live_1234567890abcdef");
+        let result = detector.detect("My API key is api_key=gitleaks_allow_test_fixture_not_real");
 
         assert!(!result.findings.is_empty());
     }
