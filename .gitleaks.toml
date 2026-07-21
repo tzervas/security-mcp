@@ -1,0 +1,10 @@
+# Gitleaks configuration file
+# Allowlist mock test keys/secrets in test files and patterns definitions
+
+[allowlist]
+description = "Allowlist mock secrets in patterns, detectors, and test suites"
+paths = [
+    '''src/patterns\.rs''',
+    '''src/detectors\.rs''',
+    '''tests/.*''',
+]
