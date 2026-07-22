@@ -3,15 +3,19 @@
 use serde_json::{json, Value};
 use std::collections::HashMap;
 
+use std::sync::Arc;
+
 use crate::pipeline::{ScreeningConfig, ScreeningDirection, ScreeningPipeline};
 use crate::protocol::{CallToolResult, InputSchema, PropertySchema, Tool};
 use crate::screeners::{InputScreener, OutputScreener, ScreeningPolicy};
+use crate::wrap::WrapController;
 
 /// Tool registry for security screening
 pub struct ToolRegistry {
     input_screener: InputScreener,
     output_screener: OutputScreener,
     pipeline: ScreeningPipeline,
+    wrap: Option<Arc<WrapController>>,
 }
 
 impl ToolRegistry {
@@ -21,16 +25,35 @@ impl ToolRegistry {
             input_screener: InputScreener::new(),
             output_screener: OutputScreener::new(),
             pipeline: ScreeningPipeline::with_defaults(),
+            wrap: None,
         }
     }
 
     /// Create with custom configuration
     pub fn with_config(config: ScreeningConfig, policy: ScreeningPolicy) -> Self {
+        Self::with_config_and_wrap(config, policy, WrapController::new(None))
+    }
+
+    /// Create with screening configuration and optional wrap controller.
+    pub fn with_config_and_wrap(
+        config: ScreeningConfig,
+        policy: ScreeningPolicy,
+        wrap: Arc<WrapController>,
+    ) -> Self {
         Self {
             input_screener: InputScreener::with_config(config.clone(), policy.clone()),
             output_screener: OutputScreener::with_config(config.clone(), policy),
             pipeline: ScreeningPipeline::new(config),
+            wrap: Some(wrap),
         }
+    }
+
+    /// Screen tool-call arguments synchronously (wrap/proxy path).
+    pub fn screen_input_sync(
+        &self,
+        content: &str,
+    ) -> crate::error::SecurityResult<crate::screeners::ScreenedContent> {
+        self.input_screener.screen(content)
     }
 
     /// Get all available tools
@@ -42,6 +65,8 @@ impl ToolRegistry {
             self.check_safe_tool(),
             self.redact_content_tool(),
             self.get_config_tool(),
+            self.proxy_status_tool(),
+            self.proxy_configure_tool(),
         ]
     }
 
@@ -54,6 +79,8 @@ impl ToolRegistry {
             "check_safe" => self.check_safe(args).await,
             "redact_content" => self.redact_content(args).await,
             "get_config" => self.get_config(args).await,
+            "proxy_status" => self.proxy_status(args).await,
+            "proxy_configure" => self.proxy_configure(args).await,
             _ => CallToolResult::error(format!("Unknown tool: {}", name)),
         }
     }
@@ -131,6 +158,36 @@ impl ToolRegistry {
             name: "get_config".to_string(),
             description: Some("Get current screening configuration".to_string()),
             input_schema: InputSchema::object(),
+        }
+    }
+
+    fn proxy_status_tool(&self) -> Tool {
+        Tool {
+            name: "proxy_status".to_string(),
+            description: Some(
+                "Report wrap/proxy child process health and configuration".to_string(),
+            ),
+            input_schema: InputSchema::object(),
+        }
+    }
+
+    fn proxy_configure_tool(&self) -> Tool {
+        Tool {
+            name: "proxy_configure".to_string(),
+            description: Some(
+                "Configure allowlisted wrap child command (requires admin_token)".to_string(),
+            ),
+            input_schema: InputSchema::object()
+                .with_required("admin_token", PropertySchema::string("Admin bearer token"))
+                .with_required("command", PropertySchema::string("Child MCP binary path"))
+                .with_property(
+                    "args",
+                    PropertySchema::string("JSON array of argv strings for the child"),
+                )
+                .with_property(
+                    "disable",
+                    PropertySchema::boolean("Set true to disable wrap mode"),
+                ),
         }
     }
 
@@ -305,6 +362,57 @@ impl ToolRegistry {
             "max_content_size": config.max_content_size,
             "timeout_ms": config.timeout_ms
         }))
+    }
+
+    async fn proxy_status(&self, _args: HashMap<String, Value>) -> CallToolResult {
+        let Some(wrap) = &self.wrap else {
+            return CallToolResult::json(json!({ "wrap_enabled": false }));
+        };
+        CallToolResult::json(wrap.status().await)
+    }
+
+    async fn proxy_configure(&self, args: HashMap<String, Value>) -> CallToolResult {
+        let Some(wrap) = &self.wrap else {
+            return CallToolResult::error("Wrap controller not available");
+        };
+
+        let admin_token = match args.get("admin_token").and_then(|v| v.as_str()) {
+            Some(t) => t,
+            None => return CallToolResult::error("Missing admin_token"),
+        };
+        let expected = std::env::var("SECURITY_MCP_ADMIN_TOKEN").ok().or_else(|| {
+            std::env::var("SECURITY_MCP_TOKENS")
+                .ok()
+                .and_then(|s| s.split(',').next().map(|t| t.trim().to_string()))
+        });
+        if expected.as_deref() != Some(admin_token) {
+            return CallToolResult::error("Invalid admin_token");
+        }
+
+        if args.get("disable").and_then(|v| v.as_bool()) == Some(true) {
+            match wrap.disable().await {
+                Ok(()) => return CallToolResult::json(json!({ "wrap_enabled": false })),
+                Err(e) => return CallToolResult::error(e.to_string()),
+            }
+        }
+
+        let command = match args.get("command").and_then(|v| v.as_str()) {
+            Some(c) => c.to_string(),
+            None => return CallToolResult::error("Missing command"),
+        };
+        let child_args = match args.get("args") {
+            Some(Value::Array(items)) => items
+                .iter()
+                .filter_map(|v| v.as_str().map(str::to_string))
+                .collect::<Vec<_>>(),
+            Some(Value::String(s)) => serde_json::from_str::<Vec<String>>(s).unwrap_or_default(),
+            _ => Vec::new(),
+        };
+
+        match wrap.configure(command, child_args).await {
+            Ok(()) => CallToolResult::json(wrap.status().await),
+            Err(e) => CallToolResult::error(e.to_string()),
+        }
     }
 }
 

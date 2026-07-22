@@ -1,0 +1,24 @@
+# security-mcp embeds intentional detector fixtures (not live credentials).
+# PR/push fleet-security uses --no-git tip scan; schedule uses full history.
+title = "security-mcp gitleaks"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Detector unit-test fixtures and build artifacts (not real secrets)"
+paths = [
+  '''src/patterns\.rs''',
+  '''src/detectors\.rs''',
+  '''(^|/)tests/''',
+  '''(^|/)target/''',
+  '''(^|/)\.git/''',
+]
+regexes = [
+  # Placeholder PAT shapes used only in unit assertions
+  '''ghp_x{20,}''',
+  '''gho_x{20,}''',
+  '''gitleaks_allow_test_fixture_not_real''',
+  # AWS docs example secret access key (deliberate fixture in tests/smoke.rs)
+  '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''',
+]
