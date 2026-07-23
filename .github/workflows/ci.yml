@@ -22,6 +22,14 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   CARGO_BUILD_JOBS: "2"
+  # Fleet runners are cgroup-capped at 8 GiB with MemorySwap == Memory — i.e. ZERO swap
+  # headroom, so a build that peaks over the cap is SIGKILLed outright rather than
+  # degrading. This job died exactly that way: `rustc --crate-name syn ... (signal: 9,
+  # SIGKILL)`. Debug info is one of rustc's largest memory consumers and is worthless to
+  # a CI run that only reports pass/fail, so drop it. `CARGO_BUILD_JOBS: 2` above already
+  # bounds concurrency; this bounds per-process peak, which is the binding constraint.
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
 
 jobs:
   build-and-test:

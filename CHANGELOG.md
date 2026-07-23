@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Eliminated two permanent false-positive CRITICALs from `fleet-security`.** Trivy's secret
+  scanner flagged this crate's own detector fixtures in `src/patterns.rs`
+  (`ghp_xxxx…` / `gho_xxxx…` placeholders asserting `GITHUB_TOKEN` matches) as GitHub tokens.
+  gitleaks was already allowlisted for exactly these (0.2.0-alpha); trivy was not, so every
+  scan reported CRITICALs that could never be actioned — the kind of finding that trains
+  reviewers to ignore the scanner precisely where it matters most.
+  Added `trivy-secret.yaml` (auto-loaded; `--secret-config` defaults to it, so no workflow
+  change). The allow-rule is scoped **by token shape, not by path**: only provider-prefixed
+  tokens whose body is a run of placeholder characters are allowed. Verified by negative test —
+  a correctly-formed 36-character `ghp_` token injected into that same file is still reported
+  CRITICAL, so the file is not blinded.
+
 ### Fixed
 - **MCP handshake was unparseable to conforming clients.** `initialize` serialized its result in
   snake_case (`protocol_version`, `server_info`, `list_changed`; also `input_schema` and `is_error`
