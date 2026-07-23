@@ -78,6 +78,15 @@ Copy the example that matches your host (replace `command` with an absolute path
 |------|----------------|
 | Cursor / VS Code Copilot | [.mcp.json.example](.mcp.json.example) |
 | Claude Desktop | [docs/mcp.example.json](docs/mcp.example.json) |
+| Claude Code (CLI) | `claude mcp add` — see below |
+
+Claude Code registers stdio servers from the CLI rather than a config file:
+
+```bash
+# -s user makes it available in every project; use -s project for one repo
+claude mcp add security-mcp -s user -- /absolute/path/to/security-mcp --stdio
+claude mcp list   # expect: security-mcp: … - ✔ Connected
+```
 
 Cursor / VS Code (`mcp.json` or `.vscode/mcp.json`):
 
