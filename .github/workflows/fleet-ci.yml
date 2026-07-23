@@ -71,12 +71,22 @@ jobs:
           set -euo pipefail
           export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
           export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}"
+          # Runners are cgroup-capped at 8 GiB with MemorySwap==Memory (no swap), so a
+          # build peaking over the cap is SIGKILLed outright. Debug info is one of
+          # rustc's largest memory consumers and a pass/fail gate never reads it.
+          export CARGO_PROFILE_DEV_DEBUG="${CARGO_PROFILE_DEV_DEBUG:-0}"
+          export CARGO_PROFILE_TEST_DEBUG="${CARGO_PROFILE_TEST_DEBUG:-0}"
           cargo check --workspace --all-targets
       - name: cargo test
         run: |
           set -euo pipefail
           export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
           export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-2}"
+          # Runners are cgroup-capped at 8 GiB with MemorySwap==Memory (no swap), so a
+          # build peaking over the cap is SIGKILLed outright. Debug info is one of
+          # rustc's largest memory consumers and a pass/fail gate never reads it.
+          export CARGO_PROFILE_DEV_DEBUG="${CARGO_PROFILE_DEV_DEBUG:-0}"
+          export CARGO_PROFILE_TEST_DEBUG="${CARGO_PROFILE_TEST_DEBUG:-0}"
           cargo test --workspace
 
   python:
