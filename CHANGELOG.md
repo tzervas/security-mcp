@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **MCP handshake was unparseable to conforming clients.** `initialize` serialized its result in
+  snake_case (`protocol_version`, `server_info`, `list_changed`; also `input_schema` and `is_error`
+  on the tool path) where the MCP wire format is camelCase, so clients dropped the connection with
+  no diagnostic — the server itself built, started, and returned a well-formed JSON-RPC frame, so
+  manual stdio smoke tests looked healthy. Added `#[serde(rename_all = "camelCase")]` to
+  `ToolsCapability`, `InitializeResult`, `Tool` and `CallToolResult`. Fields with an explicit
+  `#[serde(rename = …)]` (`type`, `enum`) are unaffected.
+
+### Added
+- Regression tests pinning the MCP wire names in both directions (camelCase present, snake_case
+  absent) so a struct edit cannot silently break the handshake again.
+- README: Claude Code (CLI) registration via `claude mcp add`, alongside the existing
+  Cursor / VS Code and Claude Desktop examples.
+
 ## [0.2.0-alpha] - 2026-07-21
 
 ### Added
