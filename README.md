@@ -10,6 +10,26 @@ MCP server for security screening: prompt-injection defense, PII detection, and 
 
 This crate is intended to sit “in front of” other tools/servers, so inputs and outputs can be screened consistently.
 
+**Status:** Alpha (`0.2.0-alpha`). Heuristic regex + entropy detectors — not a compliance certificate.
+
+## 5-minute path
+
+```bash
+git clone https://github.com/tzervas/security-mcp.git
+cd security-mcp
+
+cargo build
+cargo test --all-features
+
+# MCP over stdio (hosts attach to stdin/stdout; Ctrl-C to stop)
+cargo run -- --stdio
+# after install:  cargo install --path . && security-mcp --stdio
+```
+
+Expected: `cargo test` passes; `security-mcp --stdio` waits for JSON-RPC lines (no banner on stdout).
+Full local gate: `./scripts/check.sh`. Client snippets: [docs/mcp.example.json](docs/mcp.example.json)
+(Claude Desktop) and [.mcp.json.example](.mcp.json.example) (Cursor / VS Code).
+
 ## What This Is NOT
 
 **This is a content/text screener, not a repository, dependency, or supply-chain scanner.** It does
@@ -45,18 +65,30 @@ Alpha / under active development. Rules and thresholds will evolve.
 ## Running
 
 ```bash
-cargo run -p security-mcp -- --help
+cargo run -- --help
+cargo run -- --stdio          # MCP clients (required for stdio hosts)
+cargo run -- --host 127.0.0.1 --port 3001   # HTTP mode
 ```
 
-## Usage with VS Code / GitHub Copilot
+## MCP client config
 
-Install the binary:
+Copy the example that matches your host (replace `command` with an absolute path if needed):
+
+| Host | Example file |
+|------|----------------|
+| Cursor / VS Code Copilot | [.mcp.json.example](.mcp.json.example) |
+| Claude Desktop | [docs/mcp.example.json](docs/mcp.example.json) |
+| Claude Code (CLI) | `claude mcp add` — see below |
+
+Claude Code registers stdio servers from the CLI rather than a config file:
 
 ```bash
-cargo install security-mcp
+# -s user makes it available in every project; use -s project for one repo
+claude mcp add security-mcp -s user -- /absolute/path/to/security-mcp --stdio
+claude mcp list   # expect: security-mcp: … - ✔ Connected
 ```
 
-Add to your VS Code MCP configuration (typically `~/.config/Code/User/profiles/<profile>/mcp.json` or `.vscode/mcp.json`):
+Cursor / VS Code (`mcp.json` or `.vscode/mcp.json`):
 
 ```json
 {
@@ -70,11 +102,7 @@ Add to your VS Code MCP configuration (typically `~/.config/Code/User/profiles/<
 }
 ```
 
-> **Important**: The `--stdio` flag is required for VS Code integration. Without it, the server defaults to HTTP mode on port 3001.
-
-## Usage with Claude Desktop
-
-Add to your `claude_desktop_config.json`:
+Claude Desktop (`claude_desktop_config.json`):
 
 ```json
 {
@@ -86,6 +114,18 @@ Add to your `claude_desktop_config.json`:
   }
 }
 ```
+
+> **Important:** The `--stdio` flag is required for stdio hosts. Without it, the server defaults to HTTP on port 3001.
+
+## Local checks & pre-commit
+
+```bash
+./scripts/check.sh            # fmt + clippy + build + test (primary gate)
+pre-commit install            # optional; see .pre-commit-config.yaml
+pre-commit run --all-files
+```
+
+Details: [docs/LOCAL_CHECKS.md](docs/LOCAL_CHECKS.md). Agent notes: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md).
 
 ## False Positive Triage & Expected Rates
 

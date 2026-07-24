@@ -24,6 +24,7 @@ use security_mcp::{
     pipeline::ScreeningConfig,
     screeners::ScreeningPolicy,
     server::{SecurityServer, ServerConfig, StdioTransport},
+    wrap::WrapConfig,
     Severity,
 };
 
@@ -76,6 +77,26 @@ struct Args {
     /// Comma-separated list of valid security tokens for HTTP mode (env: SECURITY_MCP_TOKENS)
     #[arg(long, env = "SECURITY_MCP_TOKENS")]
     tokens: Option<String>,
+
+    /// Enable wrap mode: forward non-local MCP traffic to a child server (stdio/HTTP)
+    #[arg(long, env = "SECURITY_MCP_WRAP")]
+    wrap: bool,
+
+    /// Child MCP command when wrap mode is enabled
+    #[arg(long, env = "SECURITY_MCP_WRAP_COMMAND")]
+    wrap_command: Option<String>,
+
+    /// Child MCP argv when wrap mode is enabled (repeatable)
+    #[arg(long = "wrap-arg", env = "SECURITY_MCP_WRAP_ARGS", num_args = 0..)]
+    wrap_args: Vec<String>,
+
+    /// Enable WebSocket MCP transport (HTTP mode)
+    #[arg(long, default_value = "false")]
+    websocket: bool,
+
+    /// Enable SSE audit stream at /audit/sse (HTTP mode)
+    #[arg(long, default_value = "false")]
+    sse: bool,
 }
 
 #[tokio::main]
@@ -115,6 +136,22 @@ async fn main() -> anyhow::Result<()> {
             .collect::<Vec<String>>()
     });
 
+    let wrap_config = if args.wrap {
+        let command = args.wrap_command.ok_or_else(|| {
+            anyhow::anyhow!("--wrap requires --wrap-command or SECURITY_MCP_WRAP_COMMAND")
+        })?;
+        Some(WrapConfig {
+            command,
+            args: if args.wrap_args.is_empty() {
+                vec!["--stdio".to_string()]
+            } else {
+                args.wrap_args
+            },
+        })
+    } else {
+        None
+    };
+
     let server_config = ServerConfig {
         host: args.host,
         port: args.port,
@@ -122,6 +159,9 @@ async fn main() -> anyhow::Result<()> {
         policy,
         rate_limit: args.rate_limit,
         tokens: parsed_tokens,
+        wrap: wrap_config,
+        enable_websocket: args.websocket,
+        enable_sse: args.sse,
     };
 
     if args.stdio {

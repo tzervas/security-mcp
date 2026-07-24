@@ -1,7 +1,7 @@
 # security-mcp — Assessment & Gap Analysis
 
 **Date:** 2026-07-08  
-**Crate:** `security-mcp` 0.1.6-alpha (Rust)  
+**Crate:** `security-mcp` 0.2.0-alpha (Rust)
 **Role:** MCP **content/text screener** for agent tool I/O and model text  
 **Consumers:** cabal-devmelopner (Wave D), webpuppet stack (pairing intended)
 
