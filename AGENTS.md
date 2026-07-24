@@ -35,11 +35,15 @@ This project is prepared for integration:
 
 ## Local checks
 
-Look for:
-- scripts/check.sh
-- Cargo.toml / pyproject.toml + standard commands (cargo test, uv run pytest, ruff, etc.)
+```bash
+./scripts/check.sh              # primary gate (fmt + clippy + build + test)
+cargo test --all-features
+cargo run -- --stdio            # MCP stdio server
+```
 
-Run checks before considering work complete.
+Optional: `pre-commit install` (see `.pre-commit-config.yaml`). Authoritative gate is still `scripts/check.sh`.
+
+Agent cargo cheat sheet: [CLAUDE.md](CLAUDE.md).
 
 ## Further reading
 

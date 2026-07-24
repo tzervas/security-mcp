@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "security-mcp": {
+      "command": "security-mcp",
+      "args": ["--stdio"]
+    }
+  }
+}

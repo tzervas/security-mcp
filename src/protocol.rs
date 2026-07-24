@@ -118,6 +118,7 @@ pub struct ServerCapabilities {
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToolsCapability {
     #[serde(default)]
     pub list_changed: bool,
@@ -132,6 +133,7 @@ pub struct ServerInfo {
 
 /// Initialize result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InitializeResult {
     pub protocol_version: String,
     pub capabilities: ServerCapabilities,
@@ -140,6 +142,7 @@ pub struct InitializeResult {
 
 /// Tool definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Tool {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,6 +226,7 @@ pub struct CallToolRequest {
 
 /// Tool call result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CallToolResult {
     pub content: Vec<Content>,
     #[serde(default)]
@@ -261,4 +265,59 @@ impl CallToolResult {
 pub enum Content {
     #[serde(rename = "text")]
     Text { text: String },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// MCP is camelCase on the wire. These fields were emitted snake_case
+    /// (`protocol_version` / `server_info` / `list_changed` / `inputSchema` / `is_error`),
+    /// which made `initialize` unparseable to spec-conforming clients — the server built and
+    /// answered, but every client dropped the connection. Pin the wire names so a future
+    /// struct edit cannot silently regress the handshake.
+    #[test]
+    fn initialize_result_is_camel_case_on_the_wire() {
+        let v = serde_json::to_value(InitializeResult {
+            protocol_version: "2024-11-05".to_string(),
+            capabilities: ServerCapabilities {
+                tools: Some(ToolsCapability { list_changed: true }),
+            },
+            server_info: ServerInfo {
+                name: "security-mcp".to_string(),
+                version: "0".to_string(),
+            },
+        })
+        .unwrap();
+
+        assert!(v.get("protocolVersion").is_some(), "got: {v}");
+        assert!(v.get("serverInfo").is_some(), "got: {v}");
+        assert!(
+            v["capabilities"]["tools"].get("listChanged").is_some(),
+            "got: {v}"
+        );
+        // ...and never the snake_case spellings.
+        assert!(v.get("protocol_version").is_none(), "got: {v}");
+        assert!(v.get("server_info").is_none(), "got: {v}");
+    }
+
+    #[test]
+    fn tool_and_call_result_are_camel_case_on_the_wire() {
+        let t = serde_json::to_value(Tool {
+            name: "scan".to_string(),
+            description: None,
+            input_schema: InputSchema {
+                schema_type: "object".to_string(),
+                properties: HashMap::new(),
+                required: Vec::new(),
+            },
+        })
+        .unwrap();
+        assert!(t.get("inputSchema").is_some(), "got: {t}");
+        assert!(t.get("input_schema").is_none(), "got: {t}");
+
+        let r = serde_json::to_value(CallToolResult::text("ok")).unwrap();
+        assert!(r.get("isError").is_some(), "got: {r}");
+        assert!(r.get("is_error").is_none(), "got: {r}");
+    }
 }

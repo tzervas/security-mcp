@@ -7,21 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Eliminated two permanent false-positive CRITICALs from `fleet-security`.** Trivy's secret
+  scanner flagged this crate's own detector fixtures in `src/patterns.rs`
+  (`ghp_xxxx…` / `gho_xxxx…` placeholders asserting `GITHUB_TOKEN` matches) as GitHub tokens.
+  gitleaks was already allowlisted for exactly these (0.2.0-alpha); trivy was not, so every
+  scan reported CRITICALs that could never be actioned — the kind of finding that trains
+  reviewers to ignore the scanner precisely where it matters most.
+  Added `trivy-secret.yaml` (auto-loaded; `--secret-config` defaults to it, so no workflow
+  change). The allow-rule is scoped **by token shape, not by path**: only provider-prefixed
+  tokens whose body is a run of placeholder characters are allowed. Verified by negative test —
+  a correctly-formed 36-character `ghp_` token injected into that same file is still reported
+  CRITICAL, so the file is not blinded.
+
+### Fixed
+- **MCP handshake was unparseable to conforming clients.** `initialize` serialized its result in
+  snake_case (`protocol_version`, `server_info`, `list_changed`; also `input_schema` and `is_error`
+  on the tool path) where the MCP wire format is camelCase, so clients dropped the connection with
+  no diagnostic — the server itself built, started, and returned a well-formed JSON-RPC frame, so
+  manual stdio smoke tests looked healthy. Added `#[serde(rename_all = "camelCase")]` to
+  `ToolsCapability`, `InitializeResult`, `Tool` and `CallToolResult`. Fields with an explicit
+  `#[serde(rename = …)]` (`type`, `enum`) are unaffected.
+
 ### Added
-- `LICENSE` file (MIT, matching `Cargo.toml`'s declared license).
-- `tests/smoke.rs`: black-box integration smoke tests against the public API
-  (known secret is flagged, benign string is not, default config enables all
-  detectors).
+- Regression tests pinning the MCP wire names in both directions (camelCase present, snake_case
+  absent) so a struct edit cannot silently break the handshake again.
+- README: Claude Code (CLI) registration via `claude mcp add`, alongside the existing
+  Cursor / VS Code and Claude Desktop examples.
+
+## [0.2.0-alpha] - 2026-07-21
+
+### Added
+- Fleet CI standards: PR/issue templates, `fleet-ci.yml`, `fleet-security.yml`, meta issue-close/reopen workflows (`docs/FLEET_STANDARDS.md`).
 
 ### Changed
-- README: clarified this is a content/text screener (regex + entropy
-  heuristics), explicitly **not** a repository/dependency/supply-chain
-  scanner, and not a substitute for `cargo audit`/`gitleaks`/`semgrep`/`trivy`.
+- CI hardened for self-hosted runners: no bare `sudo apt-get`, pinned gitleaks install, guarded system deps, `CARGO_BUILD_JOBS`/toolchain setup for fleet cargo jobs.
+- gitleaks allowlist scoped to intentional detector-fixture secret shapes (`src/patterns.rs`, smoke tests) so fleet-security scans stay green without masking real findings.
+- Version bump `0.1.7-alpha` → `0.2.0-alpha` (CI/fleet hardening; still alpha — Wave B proxy/wrap path and eval harness remain open per `docs/ROADMAP.md`).
 
-### Chore / Hygiene (plan.md priority 1)
-- Landed `chore/tero-index-cabal-ready` (AGENTS.md, deny.toml, tero-index regen, scripts/check.sh parity, LOCAL_CHECKS, CI, W2 mentions) via dev then main using --no-ff merges.
-- Followed: tero-first queries, ./scripts/check.sh (green), /root/git/scripts/update-tero.sh, signed commits (-S), branch dev/main propagate.
-- Tero cite (from text_search "AGENTS"): AGENTS.md:2 "Use Tero + cabal-devmelopner for work here." + CHANGELOG.md:8 section.
+## [0.1.7-alpha] - 2026-07-16
+
+### Added
+- 5-minute path in README (`cargo build` / `cargo test` / `security-mcp --stdio`).
+- MCP host examples: `docs/mcp.example.json` (Claude Desktop), `.mcp.json.example` (Cursor / VS Code).
+- `CLAUDE.md` with cargo / check.sh command surface for agents.
+- Optional `.pre-commit-config.yaml` (fmt + pre-push full `scripts/check.sh`); primary gate remains `./scripts/check.sh`.
+
+### Changed
+- `scripts/check.sh` and `docs/LOCAL_CHECKS.md` note pre-commit as optional convenience.
+- Version bump `0.1.6-alpha` → `0.1.7-alpha` (docs / agent-surface production polish).
+
+### Prior unreleased notes (landed earlier on main)
+- `LICENSE` file (MIT, matching `Cargo.toml`'s declared license).
+- `tests/smoke.rs`: black-box integration smoke tests against the public API.
+- README: clarified content/text screener (not repo/CVE scanner).
+- Chore: tero-index / AGENTS / local CI parity hygiene.
 
 ## [0.1.0-alpha.2] - 2025-01-22
 
@@ -53,6 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable severity thresholds
 - Risk scoring and automated blocking
 
-[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/tzervas/security-mcp/compare/v0.2.0-alpha...HEAD
+[0.2.0-alpha]: https://github.com/tzervas/security-mcp/compare/v0.1.7-alpha...v0.2.0-alpha
+[0.1.7-alpha]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.2...v0.1.7-alpha
 [0.1.0-alpha.2]: https://github.com/tzervas/security-mcp/compare/v0.1.0-alpha.1...v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/tzervas/security-mcp/releases/tag/v0.1.0-alpha.1
